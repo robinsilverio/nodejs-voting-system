@@ -1,26 +1,29 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <h1 id="app-title">Voting System</h1>
+  <RouterView></RouterView>  
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
   name: 'App',
-  components: {
-    HelloWorld
-  }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  :root {
+    --login-width: 35%;
+    --main-background-color: #2c3e50;
+    --secondary-background-color: #199ef9;
+    --regular-padding: 15px;
+    --main-site-font: Avenir, Helvetica, Arial, sans-serif;
+  }
+  #app {
+    font-family: var(--main-site-font);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--main-background-color);
+    margin-top: 60px;
+    height: 100vh;
+  }
+  #app #app-title { text-align: center; }
 </style>
