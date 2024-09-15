@@ -1,5 +1,5 @@
 <template>
-    <div class="form-control admin" v-for="(inputField, key) of this.form.admin.inputFields" :key="key">
+    <div class="form-control admin" v-for="(inputField, key) of this.forms.adminLoginForm.inputFields" :key="key">
         <label :for="inputField.fieldName">{{inputField.label}}: </label>
         <input type="text" :name="inputField.fieldName"
                            v-model="inputField.value"
@@ -15,8 +15,8 @@
     </div>
 </template>
 <script>
-import { store } from '@/store';
-import { validateForm } from '@/utils/validator';
+    import { store } from '@/store';
+    import { validateInputs } from '@/utils/validators/validators';
 
     
     export default {
@@ -24,8 +24,8 @@ import { validateForm } from '@/utils/validator';
         data () {
             return {
                 errorMessages : [],
-                form : {
-                    admin: {
+                forms : {
+                    adminLoginForm: {
                         inputFields: [
                             {
                                 fieldName : 'username',
@@ -52,7 +52,7 @@ import { validateForm } from '@/utils/validator';
 
                 this.clearErrorMessages();
 
-                let errors = validateForm(this.form.admin); 
+                let errors = validateInputs(this.forms); 
                 if(errors !== null) {
                     errors.forEach(error => {
                         this.errorMessages.push(error);

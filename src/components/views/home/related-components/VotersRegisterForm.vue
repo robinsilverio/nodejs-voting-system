@@ -1,7 +1,7 @@
 <template>
     <div class="form-control voter">
         <label for="token">Invoeren stem token:</label>
-        <input type="text" name="token" id="token" v-on:focus="clearErrorMessages()">
+        <input type="text" name="token" id="token" v-model="this.forms.votersRegisterForm.inputFields[0].value" v-on:focus="clearErrorMessages()">
     </div>
     <div class="form-actions">
         <button type="button" @click="register()">Registreer</button>
@@ -11,21 +11,23 @@
     </div>
 </template>
 <script>
-import { validateForm } from '@/utils/validator';
+    import { validateInputs } from '@/utils/validators/validators';
 
     export default {
         name: 'VotersRegisterForm',
         data(){
             return {
                 errorMessages: [],
-                form: {
-                    inputFields: [
+                forms: {
+                    votersRegisterForm : {
+                        inputFields: [
                             {
                                 fieldName: 'token',
                                 label: 'Token',
                                 value: null
                             }
-                    ]
+                        ]
+                    }
                 }
             }
         },
@@ -39,7 +41,7 @@ import { validateForm } from '@/utils/validator';
 
                 this.clearErrorMessages();
 
-                const errors = validateForm(this.form);
+                const errors = validateInputs(this.forms); // apply changes here.
                 if (errors !== null) {
                     errors.forEach(error => {
                         this.errorMessages.push(error);
