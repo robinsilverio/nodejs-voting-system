@@ -1,0 +1,23 @@
+
+export const authModule = {
+    state : () => ({
+        user : { username: null, isLoggedIn : false, role : null }    
+    }),
+    mutations : {
+        logIn(state, paramUser) {
+            
+        },
+        logOut(state) {
+            state.user = null;
+        }
+    },
+    actions: {
+        logIn({ commit }, paramUser) {
+            console.log('Performing login');
+            commit('logIn', paramUser);
+        },
+        logOut({ commit }) {
+            commit('logOut');
+        }
+    },
+}

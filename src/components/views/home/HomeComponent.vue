@@ -38,7 +38,7 @@ export default {
     }
 }
 </script>
-<style scoped>
+<style>
     .loginform-wrapper {
         width: var(--login-width);
         margin: auto;
@@ -55,6 +55,15 @@ export default {
         display: flex;
         flex-direction: column;
         gap: var(--regular-padding);
+    }
+
+    .loginform-wrapper .login-form .form-control {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .error-messages-container {
+        color: red;
     }
 
 </style>
