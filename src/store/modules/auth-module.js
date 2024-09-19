@@ -1,3 +1,6 @@
+import { AuthService } from "@/services/auth-service";
+
+const authServiceInstance = new AuthService();
 
 export const authModule = {
     state : () => ({
@@ -5,7 +8,10 @@ export const authModule = {
     }),
     mutations : {
         logIn(state, paramUser) {
-            
+            authServiceInstance.logIn(paramUser)
+            .then(success => {
+                state.user = success.data;
+            }).catch(err => console.log(err));
         },
         logOut(state) {
             state.user = null;
