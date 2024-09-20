@@ -1,9 +1,9 @@
 import { statusCodes } from "../src/enums/status-codes.js";
-import client from "../dbclient.js";
-import { getRequestBody, sendResponse } from "../server.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { secretKey } from "./auth-service.js";
+import { getRequestBody, sendResponse } from "../server-routes.js";
+import client from "../dbclient.js";
 
 export const login = async (paramReq, paramRes) => {
     

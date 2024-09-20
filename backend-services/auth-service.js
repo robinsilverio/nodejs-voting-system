@@ -1,4 +1,4 @@
-import { sendResponse } from ".././server.js";
+import { sendResponse } from "../server-routes.js";
 import { statusCodes } from "../src/enums/status-codes.js";
 import jwt from 'jsonwebtoken';
 

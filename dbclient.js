@@ -20,4 +20,16 @@ export const startDatabaseConnection = () => {
 	});
 };
 
+export const closeDatabaseConnection = (done) => {
+    client.end()
+        .then(() => {
+            console.log('Database connection closed');
+            done();
+        })
+        .catch((err) => {
+            console.error('Error closing the database connection', err);
+            done(err); // Pass the error to the done callback
+        });
+};
+
 export default client;
