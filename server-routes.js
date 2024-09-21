@@ -4,6 +4,8 @@ import { urls } from "./src/enums/urls.js";
 const router = e.Router();
 
 router.post('/login', (req, res) => {
+    console.log(process.env.VUE_API_BASE_URL);
+    
     publicUrlHandlers[urls.PUBLIC_URLS.LOGIN](req, res);
 });
 

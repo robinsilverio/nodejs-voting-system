@@ -1,14 +1,14 @@
 <template>
     <div class="form-control admin" v-for="(inputField, key) of this.forms.adminLoginForm.inputFields" :key="key">
         <label :for="inputField.fieldName">{{inputField.label}}: </label>
-        <input type="text" :name="inputField.fieldName"
+        <input :type="inputField.type" :name="inputField.fieldName"
                            v-model="inputField.value"
                            :id="inputField.fieldName"
                            v-on:focus="clearErrorMessages()"
                            >
     </div>
     <div class="form-actions">
-        <button type="button" @click="this.logIn()">Inloggen</button>
+        <button type="button" @click="this.login()">Inloggen</button>
     </div>
     <div class="error-messages-container">
         <span v-for="(errorMessage, key) of this.onFormInvalid" :key="key">{{ errorMessage }}</span>
@@ -18,6 +18,9 @@
     import { store } from '@/store';
     import { validateInputs } from '@/utils/validators/validators';
 
+
+    
+    
     
     export default {
         name: 'AdminLoginForm',
@@ -28,11 +31,13 @@
                     adminLoginForm: {
                         inputFields: [
                             {
+                                type: 'text',
                                 fieldName : 'username',
                                 label: 'Username',
                                 value : null,
                             },
                             {
+                                type: 'password',
                                 fieldName : 'password',
                                 label: 'Password',
                                 value : null
@@ -45,22 +50,31 @@
         computed : {
             onFormInvalid() {
                 return this.errorMessages;
-            }
+            },
         },
         methods: {
-            logIn() {
+            async login() {
 
                 this.clearErrorMessages();
 
                 let errors = validateInputs(this.forms); 
-                if(errors !== null) {
+                if(errors.length != 0) {
                     errors.forEach(error => {
                         this.errorMessages.push(error);
                     });
                     return;
                 }
 
-                store.dispatch('login');
+                let loginInput = {
+                    username: this.forms.adminLoginForm.inputFields[0].value,
+                    password: this.forms.adminLoginForm.inputFields[1].value
+                }
+
+                await store.dispatch('login', loginInput);
+
+                if (store.getters.isLoginInvalid) {
+                    this.errorMessages.push('Invalid login credentials');
+                }
 
             },
             clearErrorMessages() {

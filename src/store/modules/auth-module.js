@@ -1,29 +1,38 @@
-import { AuthService } from "@/services/auth-service";
+import { LoginService } from "@/services/login-service";
 
-const authServiceInstance = new AuthService();
+const loginServiceInstance = new LoginService();
 
 export const authModule = {
     state : () => ({
-        user : { username: null, isLoggedIn : false, role : null }    
+        user : { username: null, isLoggedIn : false, role : null },
+        invalidLogin: false   
     }),
     mutations : {
-        logIn(state, paramUser) {
-            authServiceInstance.logIn(paramUser)
+        login(state, paramUser) {
+            loginServiceInstance.login(paramUser)
             .then(success => {
+                console.log(success.data);
                 state.user = success.data;
-            }).catch(err => console.log(err));
+            }).catch(err => {
+                console.log(err);
+                state.invalidLogin = true;
+            });
         },
-        logOut(state) {
+        logout(state) {
             state.user = null;
         }
     },
+    getters: {
+        isLoginInvalid(state) {
+            return state.invalidLogin;
+        }
+    },
     actions: {
-        logIn({ commit }, paramUser) {
-            console.log('Performing login');
-            commit('logIn', paramUser);
+        login({ commit }, paramUser) {
+            commit('login', paramUser);
         },
-        logOut({ commit }) {
-            commit('logOut');
+        logout({ commit }) {
+            commit('logout');
         }
     },
 }

@@ -16,17 +16,21 @@ export const login = async (paramReq, paramRes) => {
             sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong in the server. Try again.')
         } else {
             let retrievedUser = result.rows[0];
-            bcrypt.compare(requestBody.password, retrievedUser.password, (err, success) => {
-                if (success) {  
-                    loginDetails.user = { id: retrievedUser.id, username: retrievedUser.username };
-                    const token = jwt.sign(loginDetails.user, secretKey, { expiresIn: '1h' });
-                    loginDetails.loggedIn = true;
-                    loginDetails.token = token;
-                    sendResponse(paramRes, statusCodes.SUCCESS, JSON.stringify({loginDetails}));
-                    return;
-                }
+            if (retrievedUser !== undefined) {
+                bcrypt.compare(requestBody.password, retrievedUser.password, (err, success) => {
+                    if (success) {  
+                        loginDetails.user = { id: retrievedUser.id, username: retrievedUser.username };
+                        const token = jwt.sign(loginDetails.user, secretKey, { expiresIn: '1h' });
+                        loginDetails.loggedIn = true;
+                        loginDetails.token = token;
+                        sendResponse(paramRes, statusCodes.SUCCESS, JSON.stringify({loginDetails}));
+                        return;
+                    }
+                    sendResponse(paramRes, statusCodes.UNAUTHORIZED, 'Username or password is incorrect.');
+                });                
+            } else {
                 sendResponse(paramRes, statusCodes.UNAUTHORIZED, 'Username or password is incorrect.');
-            });
+            }
         }
     });
 }
