@@ -70,10 +70,10 @@
                     password: this.forms.adminLoginForm.inputFields[1].value
                 }
 
-                await store.dispatch('login', loginInput);
-
-                if (store.getters.isLoginInvalid) {
-                    this.errorMessages.push('Invalid login credentials');
+                try {
+                    await store.dispatch('login', loginInput);
+                } catch (error) {
+                    this.errorMessages.push(error);
                 }
 
             },

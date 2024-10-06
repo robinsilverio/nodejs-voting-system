@@ -5,31 +5,29 @@ const loginServiceInstance = new LoginService();
 export const authModule = {
     state : () => ({
         user : { username: null, isLoggedIn : false, role : null },
-        invalidLogin: false   
     }),
     mutations : {
-        login(state, paramUser) {
-            loginServiceInstance.login(paramUser)
-            .then(success => {
-                console.log(success.data);
-                state.user = success.data;
-            }).catch(err => {
-                console.log(err);
-                state.invalidLogin = true;
-            });
-        },
-        logout(state) {
-            state.user = null;
+        setUser(state, userData) {
+            state.user = userData;
         }
     },
     getters: {
-        isLoginInvalid(state) {
-            return state.invalidLogin;
-        }
+        
     },
     actions: {
         login({ commit }, paramUser) {
-            commit('login', paramUser);
+            return loginServiceInstance.login(paramUser)
+                .then(success => {
+                    console.log(success.data);
+                    commit('setUser', success.data);  // Use mutations to update state
+                })
+                .catch(err => {
+                    if (err.status === 401) {
+                        throw new Error('Incorrect credentials. Please try again.');
+                    } else {
+                        throw new Error('Network Error: Could not reach the server.');
+                    }
+                });
         },
         logout({ commit }) {
             commit('logout');
