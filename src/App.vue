@@ -1,5 +1,4 @@
 <template>
-  <h1 id="app-title">Voting System</h1>
   <RouterView></RouterView>  
 </template>
 
@@ -25,5 +24,4 @@ export default {
     margin-top: 60px;
     height: 100vh;
   }
-  #app #app-title { text-align: center; }
 </style>

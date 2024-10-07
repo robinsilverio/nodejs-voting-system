@@ -1,4 +1,5 @@
 <template>
+    <h1 id="app-title">Voting System</h1>
     <div class="loginform-wrapper">
         <form class="login-form">
             <template v-if="!this.loginAsAdmin">
@@ -39,11 +40,16 @@ export default {
 }
 </script>
 <style>
-    .loginform-wrapper, .dashboard-container {
+    
+    #app #app-title { text-align: center; }
+
+    .loginform-wrapper {
         margin: auto;
         padding: var(--regular-padding);
-        background-color: var(--secondary-background-color);
         border-radius: 5px;
+    }
+    .loginform-wrapper, .dashboard-container {
+        background-color: var(--secondary-background-color);
     }
     .loginform-wrapper {
         width: var(--login-width);

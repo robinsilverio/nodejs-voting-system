@@ -1,4 +1,5 @@
 <template>
+    <DashboardHeaderComponent></DashboardHeaderComponent>
     <div class="dashboard-container">
         <div class="buttons" v-for="button of this.dashboardButtons" :key="button.id">
             {{ button.value }}
@@ -6,8 +7,14 @@
     </div>
 </template>
 <script>
+
+import DashboardHeaderComponent from './related-components/DashboardHeader.vue';
+
 export default {
     name: 'DashboardComponent',
+    components: {
+        DashboardHeaderComponent,
+    },
     data() {
         return {
             dashboardButtons: [
@@ -20,10 +27,14 @@ export default {
     }
 };
 </script>
-<style>
-   .dashboard-container {
+<style scoped>
+    header {
+        justify-content: flex-end;
+    }
+    header, .dashboard-container {
         width: 80%;
+        margin: auto;
         display: flex;
         flex-wrap: wrap;
-    } 
+    }
 </style>
