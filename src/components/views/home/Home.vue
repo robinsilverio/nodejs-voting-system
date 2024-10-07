@@ -39,16 +39,18 @@ export default {
 }
 </script>
 <style>
-    .loginform-wrapper {
-        width: var(--login-width);
+    .loginform-wrapper, .dashboard-container {
         margin: auto;
         padding: var(--regular-padding);
-        text-align: center;
         background-color: var(--secondary-background-color);
+        border-radius: 5px;
+    }
+    .loginform-wrapper {
+        width: var(--login-width);
+        text-align: center;
         display: flex;
         flex-direction: column;
         gap: 15px;
-        border-radius: 5px;
     }
 
     .loginform-wrapper .login-form {
