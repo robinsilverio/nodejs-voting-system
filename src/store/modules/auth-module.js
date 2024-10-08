@@ -14,18 +14,15 @@ export const authModule = {
         setAuthstate(state, payload) {
             state.isAuthenticated = payload.isAuthenticated;
             state.user.username = payload.user.username
-            state.user.role = payload.user.role;
             state.token = payload.token;
 
             sessionStorage.setItem('authToken', payload.token);
-            sessionStorage.setItem('userRole', state.user.role);
         },
         logout(state) {
             state.isAuthenticated = false;
             state.user = { username: null, role : null };
             state.token = null;
             sessionStorage.removeItem('authToken');
-            sessionStorage.removeItem('userRole');
         }
     },
     getters: {
@@ -44,13 +41,13 @@ export const authModule = {
                         'setAuthstate', {
                             isAuthenticated: true,
                             token: success.data.loginDetails.token,
-                            user: {username: success.data.loginDetails.user.username, role: 'ADMIN'}
+                            user: { username: success.data.loginDetails.user.username } // No role set here
                         }
                     );
                     router.push('/dashboard');
                 })
                 .catch(err => {
-                    if (err.status === 401) {
+                    if (err.response.status === 401) {
                         throw new Error('Incorrect credentials. Please try again.');
                     } else {
                         throw new Error('Network Error: Could not reach the server.');
@@ -59,6 +56,7 @@ export const authModule = {
         },
         logout({ commit }) {
             commit('logout');
+            router.push('/');
         }
     },
 }

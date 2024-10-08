@@ -19,10 +19,21 @@ export const login = async (paramReq, paramRes) => {
             if (retrievedUser !== undefined) {
                 bcrypt.compare(requestBody.password, retrievedUser.password, (err, success) => {
                     if (success) {  
-                        loginDetails.user = { id: retrievedUser.id, username: retrievedUser.username };
-                        const token = jwt.sign(loginDetails.user, secretKey, { expiresIn: '1h' });
+                        loginDetails.user = { 
+                            id: retrievedUser.id,
+                            username: retrievedUser.username,
+                            role: 'ADMIN'
+                        };
+
+                        const token = jwt.sign(
+                            { username: loginDetails.user.username, role: loginDetails.user.role },
+                            secretKey, 
+                            { expiresIn: '1h' }
+                        );
+
                         loginDetails.loggedIn = true;
                         loginDetails.token = token;
+
                         sendResponse(paramRes, statusCodes.SUCCESS, JSON.stringify({loginDetails}));
                         return;
                     }
