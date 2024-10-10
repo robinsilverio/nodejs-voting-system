@@ -1,7 +1,7 @@
 import { statusCodes } from "../src/enums/status-codes.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { secretKey } from "./auth-service.js";
+import { secretKey, signJwt } from "./auth-service.js";
 import { getRequestBody, sendResponse } from "../server-routes.js";
 import client from "../dbclient.js";
 
@@ -13,7 +13,7 @@ export const login = async (paramReq, paramRes) => {
     client.query('SELECT * FROM admins WHERE username = $1', [requestBody.username], (err, result) => {
         if (err) {
             console.error('Error executing query', err);
-            sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong in the server. Try again.')
+            return sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong in the server. Try again.')
         } else {
             let retrievedUser = result.rows[0];
             if (retrievedUser !== undefined) {
@@ -25,22 +25,17 @@ export const login = async (paramReq, paramRes) => {
                             role: 'ADMIN'
                         };
 
-                        const token = jwt.sign(
-                            { username: loginDetails.user.username, role: loginDetails.user.role },
-                            secretKey, 
-                            { expiresIn: '1h' }
-                        );
+                        const token = signJwt({ username: loginDetails.user.username, role: loginDetails.user.role });
 
                         loginDetails.loggedIn = true;
                         loginDetails.token = token;
 
-                        sendResponse(paramRes, statusCodes.SUCCESS, JSON.stringify({loginDetails}));
-                        return;
+                        return sendResponse(paramRes, statusCodes.SUCCESS, JSON.stringify({loginDetails}));
                     }
-                    sendResponse(paramRes, statusCodes.UNAUTHORIZED, 'Username or password is incorrect.');
+                    return sendResponse(paramRes, statusCodes.UNAUTHORIZED, 'Username or password is incorrect.');
                 });                
             } else {
-                sendResponse(paramRes, statusCodes.UNAUTHORIZED, 'Username or password is incorrect.');
+                return sendResponse(paramRes, statusCodes.UNAUTHORIZED, 'Username or password is incorrect.');
             }
         }
     });
