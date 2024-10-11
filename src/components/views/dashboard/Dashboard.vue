@@ -1,7 +1,7 @@
 <template>
-    <DashboardHeaderComponent></DashboardHeaderComponent>
+    <HeaderComponent></HeaderComponent>
     <div class="dashboard-container">
-        <div class="buttons" v-for="button of this.dashboardButtons" :key="button.id">
+        <div class="button" v-for="button of this.dashboardButtons" :key="button.id">
             <img :src="button.iconSrc" alt="" height="150" width="150">
             {{ button.value }}
         </div>
@@ -9,12 +9,12 @@
 </template>
 <script>
 
-import DashboardHeaderComponent from './related-components/DashboardHeader.vue';
+import HeaderComponent from '../../header/Header.vue';
 
 export default {
     name: 'DashboardComponent',
     components: {
-        DashboardHeaderComponent,
+        HeaderComponent,
     },
     data() {
         return {
@@ -28,7 +28,7 @@ export default {
     }
 };
 </script>
-<style scoped>
+<style>
     header {
         justify-content: flex-end;
     }
@@ -42,10 +42,10 @@ export default {
         justify-content: space-around;
         padding: 20px 0px;
     }
-    .buttons {
+    .button {
         display: flex;
         flex-direction: column;
         text-align: center;
     }
-    .buttons img { margin: auto; }
+    .button img { margin: auto; }
 </style>

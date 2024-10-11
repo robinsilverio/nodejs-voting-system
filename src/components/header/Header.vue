@@ -7,7 +7,7 @@
     import { store } from '@/store';
 
     export default {
-        name: 'DashboardHeaderComponent',
+        name: 'HeaderComponent',
         methods: {
             logout() {
                 store.dispatch('logout');

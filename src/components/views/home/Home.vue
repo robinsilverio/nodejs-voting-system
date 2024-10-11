@@ -48,7 +48,7 @@ export default {
         padding: var(--regular-padding);
         border-radius: 5px;
     }
-    .loginform-wrapper, .dashboard-container {
+    .loginform-wrapper, .dashboard-container, .voterview-container {
         background-color: var(--secondary-background-color);
     }
     .loginform-wrapper {

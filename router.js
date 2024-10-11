@@ -1,8 +1,8 @@
-import NotFoundView from '@/components/NotFoundView.vue';
+import NotFoundView from '@/components/views/NotFoundView.vue';
 import AccessDeniedComponent from '@/components/views/AccessDenied.vue';
 import DashboardComponent from '@/components/views/dashboard/Dashboard.vue';
 import Home from '@/components/views/home/Home.vue';
-import { store } from '@/store';
+import VoterView from '@/components/views/VoterView/VoterView.vue';
 import axios from 'axios';
 import { createMemoryHistory, createRouter } from 'vue-router';
 
@@ -17,6 +17,11 @@ const routes = [
     path: '/dashboard',
     name: 'dashboard',
     component: DashboardComponent
+  },
+  {
+    path: '/voter-view',
+    name: 'VoterView',
+    component: VoterView
   },
   {
     path: '/:pathMatch(.*)*',
