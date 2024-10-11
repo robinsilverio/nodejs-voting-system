@@ -1,6 +1,6 @@
 import { login } from './backend-services/login-service.js';
 import e from 'express';
-import { secretKey, validateJwt } from './backend-services/auth-service.js';
+import { validateJwt } from './backend-services/auth-service.js';
 const router = e.Router();
 
 router.post('/login', (req, res) => {

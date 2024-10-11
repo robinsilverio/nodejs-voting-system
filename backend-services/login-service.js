@@ -1,7 +1,7 @@
 import { statusCodes } from "../src/enums/status-codes.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { secretKey, signJwt } from "./auth-service.js";
+import { signJwt } from "./auth-service.js";
 import { getRequestBody, sendResponse } from "../server-routes.js";
 import client from "../dbclient.js";
 
