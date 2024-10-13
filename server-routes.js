@@ -1,18 +1,11 @@
-import { login } from './backend-services/login-service.js';
 import e from 'express';
-import { validateJwt } from './backend-services/auth-service.js';
-import { registerVoter } from './backend-services/register-service.js';
+import { login, validateJwt } from './backend-controllers/login-controller.js';
+import { registerVoter } from './backend-controllers/register-controller.js';
 const router = e.Router();
 
-router.post('/login', (req, res) => {
-    return login(req, res);
-});
-router.post('/register-voter', (req, res) => {
-    return registerVoter(req, res);
-});
-router.get('/validate-jwt', (req, res) => {
-    return validateJwt(req, res);
-});
+router.post('/login', (req, res) => login(req, res));
+router.post('/register-voter', (req, res) => registerVoter(req, res));
+router.get('/validate-jwt', (req, res) => validateJwt(req, res));
 
 export const getRequestBody = (paramReq) => {
     return new Promise((resolve, reject) => {

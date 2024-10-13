@@ -2,7 +2,7 @@ import { statusCodes } from "../src/enums/status-codes.js";
 import client from "../dbclient.js";
 import { getRequestBody, sendResponse } from "../server-routes.js"
 
-export const registerVoter = async(req, res) => {
+export const performRegisteringVoter = async(req, res) => {
 
     try {
 
