@@ -1,10 +1,14 @@
 import { login } from './backend-services/login-service.js';
 import e from 'express';
 import { validateJwt } from './backend-services/auth-service.js';
+import { registerVoter } from './backend-services/register-service.js';
 const router = e.Router();
 
 router.post('/login', (req, res) => {
     return login(req, res);
+});
+router.post('/register-voter', (req, res) => {
+    return registerVoter(req, res);
 });
 router.get('/validate-jwt', (req, res) => {
     return validateJwt(req, res);
