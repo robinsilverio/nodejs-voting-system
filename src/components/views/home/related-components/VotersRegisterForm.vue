@@ -11,7 +11,8 @@
     </div>
 </template>
 <script>
-    import { validateInputs } from '@/utils/validators/validators';
+import { store } from '@/store';
+import { validateInputs } from '@/utils/validators/validators';
 
     export default {
         name: 'VotersRegisterForm',
@@ -37,17 +38,29 @@
             }
         },
         methods: {
-            register() {
+            async  register() {
+
 
                 this.clearErrorMessages();
 
                 const errors = validateInputs(this.forms); // apply changes here.
-                if (errors !== null) {
+                if (errors.length != 0) {
                     errors.forEach(error => {
                         this.errorMessages.push(error);
                     });
                     return;
                 }
+
+                const voterObject = {
+                    token: this.forms.votersRegisterForm.inputFields[0].value
+                }
+
+                try {
+                    await store.dispatch('registerVoter', voterObject);
+                } catch(error) {
+                    this.errorMessages.push(error);
+                }
+
             },
             clearErrorMessages() {
                 this.errorMessages = [];

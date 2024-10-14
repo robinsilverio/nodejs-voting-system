@@ -6,6 +6,8 @@ const router = e.Router();
 router.post('/login', (req, res) => login(req, res));
 router.post('/register-voter', (req, res) => registerVoter(req, res));
 router.get('/validate-jwt', (req, res) => validateJwt(req, res));
+router.get('/validate-voter-token',  (req, res) => validateVoterToken(req, res));
+
 
 export const getRequestBody = (paramReq) => {
     return new Promise((resolve, reject) => {
