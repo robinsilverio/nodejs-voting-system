@@ -65,7 +65,30 @@ export const insertIntoDatabase = (paramTableName, paramColumns, paramValues) =>
     }
 };
 
+export  const updateFromDatabase = (paramTableName, paramColumns, paramConditions, paramValues) => {
+    try {
+        let queryText = `UPDATE ${paramTableName} SET `;
+        queryText += paramColumns.map((column, index) => `${column} = $${index}`).join(', ');
+        queryText += ` WHERE ${Object.keys(paramConditions).map(key => `${key} = ${Object.keys(paramConditions).indexOf(key) + 1}`).join(' AND ')}`;
 
+        const query = {
+            text:  queryText,
+            values: paramValues
+        }
+        console.log(query);
+    }  catch (err) {
+        throw new Error('Error updating record ', err);
+    }
+}
 
+export const deleteFromDatabase = (paramTableName,  paramConditions) => {
+    try {
+        let queryText = `DELETE FROM ${paramTableName} WHERE `;
+        queryText += Object.keys(paramConditions).map(key => `${key} = $${Object.keys(paramConditions).indexOf(key) + 1 }`).join(' AND ');
+        return client.query(queryText); 
+    } catch (err) {
+        throw new Error('Error deleting record from database', err);
+    }
+}
 
 export default client;
