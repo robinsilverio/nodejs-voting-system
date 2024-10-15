@@ -1,6 +1,7 @@
 import { statusCodes } from "../src/enums/status-codes.js";
-import client, { insertIntoDatabase, retrieveFromDatabase } from "../dbclient.js";
-import { getRequestBody, sendResponse } from "../server-routes.js"
+import { insertIntoDatabase, retrieveFromDatabase } from "../dbclient.js";
+import { getRequestBody, sendResponse } from "../server-routes.js";
+import { signJwt } from "./login-service.js";
 
 export const performRegisteringVoter = async(req, res) => {
 
@@ -15,7 +16,8 @@ export const performRegisteringVoter = async(req, res) => {
         }
 
         const voterDetails = await insertVoter(validToken.id);
-        return sendResponse(res, statusCodes.SUCCESS, voterDetails);
+        const jwtToken = signJwt(voterDetails, '1d');
+        return sendResponse(res, statusCodes.SUCCESS, jwtToken);
 
     } catch(error) {
         console.error(error);
@@ -34,6 +36,7 @@ const insertVoter = async(paramTokenId) => {
     const result = await insertIntoDatabase('voters', ['token_id'],  [paramTokenId]);
     return {
         id: result.rows[0].id,
-        token_id: paramTokenId
+        token_id: paramTokenId,
+        role: 'VOTER'
     }
 }

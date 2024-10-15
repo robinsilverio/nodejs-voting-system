@@ -1,17 +1,15 @@
 import { VoterRegisterService } from "@/services/voterRegister-service";
-import axios from "axios";
+import { router } from "../../../router.js";
 
 const voterRegisterService = new VoterRegisterService();
 
 export const voterRegisterModule = {
     state: () => ({
-        voter: { id: null, token: null }
+        voter: !!sessionStorage.getItem('authToken')
     }),
     mutations: {
         setVoter(state, payload){
-            state.voter.id = payload.id;
-            state.voter.token = payload.token;
-            sessionStorage.setItem('voter',  JSON.stringify(state.voter));
+            sessionStorage.setItem('authToken', payload);
         }
     },
     getters: {
@@ -22,6 +20,7 @@ export const voterRegisterModule = {
             return voterRegisterService.registerVoter(payload)
             .then((success) => {
                 commit('setVoter', success.data);
+                router.push('/voter-view');
             }).catch((error) => {
                 throw new Error(error.response.data);
             });

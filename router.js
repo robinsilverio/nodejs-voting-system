@@ -35,6 +35,11 @@ const routes = [
   }
 ];
 
+const pathByRole = {
+  'ADMIN':  '/dashboard',
+  'VOTER': '/voter-view',
+}
+
 
 export const router = createRouter({
   history: createMemoryHistory(),
@@ -44,6 +49,7 @@ export const router = createRouter({
 router.beforeEach(async(to, from, next) => {
   
   const publicPages = ['/'];
+  const rolesAllowed = ['ADMIN', 'VOTER'];
   const authRequired = !publicPages.includes(to.path);
   const token = sessionStorage.getItem('authToken');
 
@@ -56,13 +62,12 @@ router.beforeEach(async(to, from, next) => {
 
       const userRole = response.data.role;
 
-      // Redirect to dashboard if user tries to access the login/home page but is authenticated
-      if (to.path === '/' && userRole) {
-        return next('/dashboard');
+      // Redirect to dashboard if user tries to access the login/home page but is authenticated.
+      if (to.path === '/' && rolesAllowed.includes(userRole)) {
+        next(pathByRole[userRole]);
       }
-
       // Allow access to the dashboard only if the user has the 'ADMIN' role
-      if (to.path === '/dashboard' && userRole !== 'ADMIN') {
+      if ((to.path === '/dashboard' || to.path === '/voter-view') && !rolesAllowed.includes(userRole)) {
         return next('/access-denied');
       }
 

@@ -56,6 +56,6 @@ export const performJwtValidation = (paramReq, paramRes) => {
     });
 }
 
-export const signJwt = (paramBody) => {
-    return jwt.sign(paramBody, `${process.env.JWT_SECRET_KEY}`, { expiresIn: '1h'});
+export const signJwt = (paramBody, paramExpiresIn='1h') => {
+    return jwt.sign(paramBody, `${process.env.JWT_SECRET_KEY}`, { expiresIn: paramExpiresIn });
 }

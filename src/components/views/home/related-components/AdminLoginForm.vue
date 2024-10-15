@@ -65,9 +65,12 @@
                     return;
                 }
 
+                const username = this.forms.adminLoginForm.inputFields[0].value;
+                const password = this.forms.adminLoginForm.inputFields[1].value;
+
                 let loginInput = {
-                    username: this.forms.adminLoginForm.inputFields[0].value,
-                    password: this.forms.adminLoginForm.inputFields[1].value
+                    username: username,
+                    password: password ?? ''
                 }
 
                 try {
