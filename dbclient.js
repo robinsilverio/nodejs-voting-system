@@ -52,14 +52,17 @@ export const retrieveFromDatabase = (paramTableName, paramColumns, paramConditio
 
 export const insertIntoDatabase = (paramTableName, paramColumns, paramValues) => {
     try {
-        let queryText = `INSERT INTO ${paramTableName} (${paramColumns.join(',')}) `;
-        queryText +=  `VALUES (${paramValues.map(() => '$' + (paramValues.length)).join(', ')}) RETURNING id`;
+        
+        let queryText = `INSERT INTO ${paramTableName} (${paramColumns.join(', ')}) `;
+        queryText +=  `VALUES (${paramValues.map((key) => '$' + (Object.values(paramValues).indexOf(key) + 1)).join(', ')}) RETURNING id`;
 
         const query = {
             text: queryText,
             values:  paramValues
-        }
+        };
+
         return client.query(query);
+
     }  catch (err) {
         throw new Error('Error inserting record into database', err);
     }
@@ -75,7 +78,9 @@ export  const updateFromDatabase = (paramTableName, paramColumns, paramCondition
             text:  queryText,
             values: paramValues
         }
-        console.log(query);
+
+        return client.query(query);
+
     }  catch (err) {
         throw new Error('Error updating record ', err);
     }
