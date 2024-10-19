@@ -22,6 +22,9 @@ export const voterRegisterModule = {
                 commit('setVoter', success.data);
                 router.push('/voter-view');
             }).catch((error) => {
+                if (error.code === 'ERR_NETWORK') {
+                    throw new Error('Network Error: Could not reach the server.');
+                }
                 throw new Error(error.response.data);
             });
         }

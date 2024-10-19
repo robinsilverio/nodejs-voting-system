@@ -46,16 +46,11 @@ export const authModule = {
                     );
                     router.push('/dashboard');
                 })
-                .catch(err => {
-                    if (err.code === 'ERR_NETWORK') {
+                .catch(error => {
+                    if (error.code === 'ERR_NETWORK') {
                         throw new Error('Network Error: Could not reach the server.');
-                    } else {
-                        if (err.response.status === 401) {
-                            throw new Error('Incorrect credentials. Please try again.');
-                        } else {
-                            throw new Error('Something went wrong with the server.');
-                        }
                     }
+                    throw new Error(error.response.data);
                 });
         },
         logout({ commit }) {
