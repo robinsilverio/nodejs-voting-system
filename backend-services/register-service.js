@@ -27,8 +27,8 @@ export const performRegisteringVoter = async(req, res) => {
 }
 
 const checkToken = async(paramToken) => {
-    const conditions = {'voting_token': paramToken, 'inuse': false};
-    const result = await retrieveFromDatabase('voting_token', ['id'], conditions);
+    const conditions = {'token': paramToken, 'inuse': false};
+    const result = await retrieveFromDatabase('voter_token', ['id'], conditions);
     return result.rows.length >  0 ? result.rows[0] : null;
 }
 
