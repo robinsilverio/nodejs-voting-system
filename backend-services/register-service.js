@@ -33,7 +33,7 @@ const checkToken = async(paramToken) => {
 }
 
 const insertVoter = async(paramTokenId) => {
-    const result = await insertIntoDatabase('voters', ['token_id'],  [paramTokenId]);
+    const result = await insertIntoDatabase('voter', ['token_id'],  [paramTokenId]);
     return {
         id: result.rows[0].id,
         token_id: paramTokenId,

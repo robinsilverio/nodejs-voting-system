@@ -9,7 +9,7 @@ export const performLogin = async (paramReq, paramRes) => {
     let requestBody = await getRequestBody(paramReq);
     let loginDetails = { user : null, loggedIn: false };
     
-    const result = await retrieveFromDatabase('admins', ['*'], { username: requestBody.username });
+    const result = await retrieveFromDatabase('admin', ['*'], { username: requestBody.username });
     const retrievedUser = result.rows[0];
     
     if (retrievedUser !== undefined) {
