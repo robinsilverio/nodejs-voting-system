@@ -33,17 +33,9 @@ export const closeDatabaseConnection = (done) => {
 };
 
 export const retrieveFromDatabase = (paramTableName, paramColumns, paramConditions) => {
-    try {
-        const query = {
-            text: `SELECT ${paramColumns.join(', ')} FROM ${paramTableName}`,
-            values: Object.values(paramConditions)
-        };
-        
-        if (paramConditions) {
-            query.text += ` WHERE ${Object.keys(paramConditions).map(key => `${key} = $${Object.keys(paramConditions).indexOf(key) + 1}`).join(' AND ')}`;
-        }
 
-        return client.query(query);
+    try {
+        return client.query(returnQuery(paramTableName, paramColumns, paramConditions));
     } catch (err) {
         console.error('Error retrieving records from database', err);
         throw err;
@@ -95,5 +87,17 @@ export const deleteFromDatabase = (paramTableName,  paramConditions) => {
         throw new Error('Error deleting record from database', err);
     }
 }
+
+const returnQuery = (paramTableName, paramColumns, paramConditions) => {
+    return Object.keys(paramConditions).length > 0
+        ? {
+            text: `SELECT ${paramColumns.join(', ')} FROM ${paramTableName} WHERE ${Object.keys(paramConditions).map((key, index) => `${key} = $${index + 1}`).join(' AND ')}`,
+            values: Object.values(paramConditions)
+        }
+        : {
+            text: `SELECT ${paramColumns.join(', ')} FROM ${paramTableName}`,
+            values: []
+        };
+};
 
 export default client;

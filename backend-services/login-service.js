@@ -3,13 +3,14 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { getRequestBody, sendResponse } from "../server-routes.js";
 import { retrieveFromDatabase } from "../dbclient.js";
+import { tableColumnsPerTable } from "../src/enums/tablecolumnspertable.js";
 
 export const performLogin = async (paramReq, paramRes) => {
     
     let requestBody = await getRequestBody(paramReq);
     let loginDetails = { user : null, loggedIn: false };
     
-    const result = await retrieveFromDatabase('admin', ['*'], { username: requestBody.username });
+    const result = await retrieveFromDatabase('admin', tableColumnsPerTable.ADMIN, { username: requestBody.username });
     const retrievedUser = result.rows[0];
     
     if (retrievedUser !== undefined) {

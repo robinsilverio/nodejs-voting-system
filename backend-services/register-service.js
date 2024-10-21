@@ -2,6 +2,7 @@ import { statusCodes } from "../src/enums/status-codes.js";
 import { insertIntoDatabase, retrieveFromDatabase } from "../dbclient.js";
 import { getRequestBody, sendResponse } from "../server-routes.js";
 import { signJwt } from "./login-service.js";
+import { tableColumnsPerTable } from "../src/enums/tablecolumnspertable.js";
 
 export const performRegisteringVoter = async(req, res) => {
 
@@ -28,12 +29,15 @@ export const performRegisteringVoter = async(req, res) => {
 
 const checkToken = async(paramToken) => {
     const conditions = {'token': paramToken, 'inuse': false};
-    const result = await retrieveFromDatabase('voter_token', ['id'], conditions);
+    const result = await retrieveFromDatabase('voter_token', tableColumnsPerTable.VOTER_TOKEN, conditions);
     return result.rows.length >  0 ? result.rows[0] : null;
 }
 
 const insertVoter = async(paramTokenId) => {
-    const result = await insertIntoDatabase('voter', ['token_id'],  [paramTokenId]);
+
+    const tokenIdColumn = tableColumnsPerTable.VOTER.filter(column => column !== 'id');
+    const result = await insertIntoDatabase('voter', tokenIdColumn,  [paramTokenId]);
+    
     return {
         id: result.rows[0].id,
         token_id: paramTokenId,

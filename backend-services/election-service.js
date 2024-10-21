@@ -1,7 +1,19 @@
 import { statusCodes } from "../src/enums/status-codes.js";
 import { insertIntoDatabase, retrieveFromDatabase } from "../dbclient.js";
 import { getRequestBody, sendResponse } from "../server-routes.js";
+import { tableColumnsPerTable } from "../src/enums/tablecolumnspertable.js";
 
+
+export const performRetrieveElections = async(paramReq, paramRes) => {
+
+    try {
+        const elections = await retrieveFromDatabase('election', tableColumnsPerTable.ELECTION, {});
+        return sendResponse(paramRes, statusCodes.SUCCESS,  elections);
+    } catch (error) {
+        console.log(error);
+        return  sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong while retrieving elections from database');
+    }
+}
 
 export const performCreateElection = async(paramReq, paramRes) => {
     
