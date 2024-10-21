@@ -1,5 +1,5 @@
 import { statusCodes } from "../src/enums/status-codes.js";
-import { insertIntoDatabase, retrieveFromDatabase } from "../dbclient.js";
+import { insertIntoDatabase, retrieveFromDatabase, updateFromDatabase } from "../dbclient.js";
 import { getRequestBody, sendResponse } from "../server-routes.js";
 import { tableColumnsPerTable } from "../src/enums/tablecolumnspertable.js";
 
@@ -33,6 +33,29 @@ export const performCreateElection = async(paramReq, paramRes) => {
     }
 
 }
+
+export const  performUpdateElection = async(paramReq, paramRes) => {
+    try {
+        let requestBody = await getRequestBody(paramReq);
+        const resultFromRetrievingSingleElection = await retrieveFromDatabase('election', tableColumnsPerTable.ELECTION, { id: requestBody.id });
+        const election = resultFromRetrievingSingleElection.rows[0];
+
+        if (election === undefined) {
+            return sendResponse(paramRes, statusCodes.NOT_FOUND, 'Election not found.');
+        } else {
+            requestBody = Object.fromEntries(
+                Object.entries(requestBody).filter(([key]) => key !== 'id') // Filter out 'id'
+            );
+            const updatedElection = await updateFromDatabase('election', tableColumnsPerTable.ELECTION.filter(column => column !== 'id'), { id: requestBody.id }, Object.values(requestBody));
+            return sendResponse(paramRes, statusCodes.SUCCESS, 'Updating election was successful.');
+        }
+    } catch (error) {
+        console.error(error);
+        return sendResponse(paramRes,  statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong with the server.');
+    }
+}
+
+
 
 const electionExists = async (electionName) => {
     const conditions = { 'election_name' : electionName };

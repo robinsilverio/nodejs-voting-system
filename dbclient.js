@@ -87,7 +87,7 @@ const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditio
         }
     } else if (paramQueryType === 'UPDATE') {
         return {
-            text: `UPDATE  ${paramTableName}  SET  ${(paramColumns.map((column, index) => `${column} = $${index}`).join(', '))} WHERE ${Object.keys(paramConditions).map(key => `${key} = ${Object.keys(paramConditions).indexOf(key) + 1}`).join(' AND ')}`,
+            text: `UPDATE  ${paramTableName}  SET  ${(paramColumns.map((column, index) => `${column} = $${index + 1}`).join(', '))} WHERE ${Object.keys(paramConditions).map(key => `${key} = ${Object.keys(paramConditions).indexOf(key) + 1}`).join(' AND ')}`,
             values: paramValues
         }
     } else if (paramQueryType === 'DELETE') {
