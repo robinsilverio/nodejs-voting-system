@@ -3,6 +3,7 @@ import { login, validateJwt } from './backend-controllers/login-controller.js';
 import { registerVoter } from './backend-controllers/register-controller.js';
 import { 
     createElection, 
+    deleteElection, 
     retrieveElections, 
     updateElection 
 } from './backend-controllers/election-controller.js';
@@ -16,6 +17,7 @@ router.get('/validate-voter-token',  (req, res) => validateVoterToken(req, res))
 router.post('/elections', (req, res) =>  createElection(req, res));
 router.get('/elections',  (req, res) => retrieveElections(req, res));
 router.put('/elections',  (req, res) => updateElection(req, res));
+router.delete('/elections', (req, res) => deleteElection(req, res));
 
 
 

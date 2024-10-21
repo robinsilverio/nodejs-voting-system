@@ -60,9 +60,7 @@ export  const updateFromDatabase = (paramTableName, paramColumns, paramCondition
 
 export const deleteFromDatabase = (paramTableName,  paramConditions) => {
     try {
-        let queryText = `DELETE FROM ${paramTableName} WHERE `;
-        queryText += Object.keys(paramConditions).map(key => `${key} = $${Object.keys(paramConditions).indexOf(key) + 1 }`).join(' AND ');
-        return client.query(queryText); 
+        return client.query(returnQuery('DELETE', paramTableName, [], paramConditions));
     } catch (err) {
         throw new Error('Error deleting record from database', err);
     }

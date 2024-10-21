@@ -1,5 +1,10 @@
 import { statusCodes } from "../src/enums/status-codes.js";
-import { insertIntoDatabase, retrieveFromDatabase, updateFromDatabase } from "../dbclient.js";
+import { 
+    deleteFromDatabase, 
+    insertIntoDatabase, 
+    retrieveFromDatabase, 
+    updateFromDatabase
+} from "../dbclient.js";
 import { getRequestBody, sendResponse } from "../server-routes.js";
 import { tableColumnsPerTable } from "../src/enums/tablecolumnspertable.js";
 
@@ -50,6 +55,20 @@ export const  performUpdateElection = async(paramReq, paramRes) => {
     } catch (error) {
         console.error(error);
         return sendResponse(paramRes,  statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong with the server.');
+    }
+}
+
+export const performDeleteElection = async (paramReq, paramRes) => {
+    try {
+        if (!await electionExists(null, paramReq.query.id)) {
+            return sendResponse(paramRes, statusCodes.NOT_FOUND, 'Election not found.');
+        }  else {
+            await deleteFromDatabase('election', { id: paramReq.query.id });
+            return sendResponse(paramRes, statusCodes.SUCCESS, 'Election was successfully deleted.');
+        }
+    } catch (error) {
+        console.error(error);
+        return sendResponse(paramRes,  statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong with the server');
     }
 }
 
