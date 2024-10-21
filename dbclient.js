@@ -82,7 +82,7 @@ const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditio
             };
     } else if (paramQueryType === 'INSERT') {
         return {
-            text: `INSERT INTO ${paramTableName} (${paramColumns.join(', ')}) VALUES (${paramValues.map((key) => '$' + (Object.values(paramValues).indexOf(key) + 1)).join(', ')}) RETURNING id`,
+            text: `INSERT INTO ${paramTableName} (${paramColumns.join(', ')}) VALUES (${paramValues.map((value, index) => `$${index + 1}`).join(', ')}) RETURNING id`,
             values: paramValues
         }
     } else if (paramQueryType === 'UPDATE') {

@@ -37,10 +37,8 @@ export const performCreateElection = async(paramReq, paramRes) => {
 export const  performUpdateElection = async(paramReq, paramRes) => {
     try {
         let requestBody = await getRequestBody(paramReq);
-        const resultFromRetrievingSingleElection = await retrieveFromDatabase('election', tableColumnsPerTable.ELECTION, { id: requestBody.id });
-        const election = resultFromRetrievingSingleElection.rows[0];
 
-        if (election === undefined) {
+        if (!await electionExists(null, requestBody.id)) {
             return sendResponse(paramRes, statusCodes.NOT_FOUND, 'Election not found.');
         } else {
             requestBody = Object.fromEntries(
@@ -55,11 +53,9 @@ export const  performUpdateElection = async(paramReq, paramRes) => {
     }
 }
 
-
-
-const electionExists = async (electionName) => {
-    const conditions = { 'election_name' : electionName };
-    const result = await retrieveFromDatabase('election', ['election_name'], conditions);
+const electionExists = async (paramElectionName, paramId) => {
+    const conditions = paramId ? { 'id' : paramId } : { 'election_name' : paramElectionName };
+    const result = await retrieveFromDatabase('election', tableColumnsPerTable.ELECTION, conditions);
     return result.rows.length >  0 ? result.rows[0] : null;
 }
 
@@ -68,8 +64,8 @@ const insertElection = async(paramElection) => {
         election_name: paramElection.election_name,
         election_description: paramElection.election_description,
         election_type: paramElection.election_type,
-        election_start_date: paramElection.election_start_date,
-        election_end_date: paramElection.election_end_date
+        election_startdate: paramElection.election_startdate,
+        election_enddate: paramElection.election_enddate
     }
 
     const result = await insertIntoDatabase('election', Object.keys(election), Object.values(election));
