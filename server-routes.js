@@ -7,6 +7,12 @@ import {
     retrieveElections, 
     updateElection 
 } from './backend-controllers/election-controller.js';
+import { 
+    createCandidate, 
+    deleteCandidate, 
+    retrieveCandidates, 
+    updateCandidate 
+} from './backend-controllers/candidate-controller.js';
 
 const router = e.Router();
 
@@ -18,6 +24,10 @@ router.post('/elections', (req, res) =>  createElection(req, res));
 router.get('/elections',  (req, res) => retrieveElections(req, res));
 router.put('/elections',  (req, res) => updateElection(req, res));
 router.delete('/elections', (req, res) => deleteElection(req, res));
+router.post('/candidates', (req, res) => createCandidate(req, res));
+router.get('/candidates', (req, res) => retrieveCandidates(req, res));
+router.put('/candidates', (req, res) => updateCandidate(req, res));
+router.delete('/candidates', (req, res) => deleteCandidate(req, res));
 
 
 

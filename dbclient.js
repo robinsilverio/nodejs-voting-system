@@ -1,7 +1,8 @@
+import { tableColumnsPerTable } from './src/enums/tablecolumnspertable.js';
 import pkg from 'pg';
 const { Client } = pkg;
 
-const client = new Client(
+const client = new Client(  
     {
         user: 'postgres',
         password: 'postgres',
@@ -32,7 +33,7 @@ export const closeDatabaseConnection = (done) => {
         });
 };
 
-export const retrieveFromDatabase = (paramTableName, paramColumns, paramConditions) => {
+export const retrieve = (paramTableName, paramColumns, paramConditions) => {
 
     try {
         return client.query(returnQuery('SELECT', paramTableName, paramColumns, paramConditions));
@@ -42,7 +43,9 @@ export const retrieveFromDatabase = (paramTableName, paramColumns, paramConditio
     }
 };
 
-export const insertIntoDatabase = (paramTableName, paramColumns, paramValues) => {
+export const insert = (paramTableName, paramColumns, paramValues) => {
+
+    console.log(returnQuery('INSERT', paramTableName, paramColumns, {}, paramValues));
     try {
         return client.query(returnQuery('INSERT', paramTableName, paramColumns, {}, paramValues));
     }  catch (err) {
@@ -50,7 +53,7 @@ export const insertIntoDatabase = (paramTableName, paramColumns, paramValues) =>
     }
 };
 
-export  const updateFromDatabase = (paramTableName, paramColumns, paramConditions, paramValues) => {
+export  const update = (paramTableName, paramColumns, paramConditions, paramValues) => {
     try {
         return client.query(returnQuery('UPDATE', paramTableName, paramColumns, paramConditions, paramValues));
     }  catch (err) {
@@ -58,7 +61,7 @@ export  const updateFromDatabase = (paramTableName, paramColumns, paramCondition
     }
 }
 
-export const deleteFromDatabase = (paramTableName,  paramConditions) => {
+export const remove = (paramTableName,  paramConditions) => {
     try {
         return client.query(returnQuery('DELETE', paramTableName, [], paramConditions));
     } catch (err) {
@@ -97,5 +100,21 @@ const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditio
         throw new Error('Invalid query type');
     }
 };
+
+export const filterId = (paramRequestBody) => {
+    return Object.fromEntries(
+        Object.entries(paramRequestBody).filter(([key]) => key !== 'id') // Filter out 'id'
+    );
+}
+
+export const existsInDatabase = async (paramTableName, paramConditions) => {
+    const result = await retrieve(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()], paramConditions);
+    return result.rows.length >  0 ? result.rows[0] : null;
+}   
+
+export const insertIntoTable = async (paramTableName, paramData) => {
+    const data = filterId(paramData);
+    return await insert(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()].filter(column => column !== 'id'), Object.values(data));
+}
 
 export default client;

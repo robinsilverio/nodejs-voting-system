@@ -21,4 +21,11 @@ export const tableColumnsPerTable = {
         'election_startdate',
         'election_enddate'
     ],
+    'CANDIDATE' : [
+        'id',
+        'candidate_name',
+        'party_affiliation',
+        'election_id',
+        'runs_for'
+    ],
 }
