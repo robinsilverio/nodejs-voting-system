@@ -36,6 +36,7 @@ export const closeDatabaseConnection = (done) => {
 const executeQuery = async (queryType, paramTableName, paramColumns, paramConditions = {}, paramValues = {}) => {
     try {
         const query = returnQuery(queryType, paramTableName, paramColumns, paramConditions, paramValues);
+        console.log(query);
         return await client.query(query);
     } catch (err) {
         throw new Error(`Error executing ${queryType} operation: ${err.message}`);
@@ -58,35 +59,40 @@ export const remove = (paramTableName,  paramConditions) => {
     return executeQuery('DELETE', paramTableName, [], paramConditions);
 }
 
-const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditions = {},  paramValues = {}) => {
 
-    if (paramQueryType === 'SELECT') {
-        return Object.keys(paramConditions).length > 0
-            ? {
-                text: `SELECT ${paramColumns.join(', ')} FROM ${paramTableName} WHERE ${Object.keys(paramConditions).map((key, index) => `${key} = $${index + 1}`).join(' AND ')}`,
+const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditions = {}, paramValues = {}) => {
+    
+    const whereClause = Object.keys(paramConditions).length > 0
+        ? `WHERE ${Object.keys(paramConditions).map((key, index) => `${key} = $${index + 1}`).join(' AND ')}`
+        : '';
+
+    const columns = paramColumns.join(', ');
+
+    switch (paramQueryType) {
+        case 'SELECT':
+            return {
+                text: `SELECT ${columns} FROM ${paramTableName} ${whereClause}`,
                 values: Object.values(paramConditions)
-            }
-            : {
-                text: `SELECT ${paramColumns.join(', ')} FROM ${paramTableName}`,
-                values: []
             };
-    } else if (paramQueryType === 'INSERT') {
-        return {
-            text: `INSERT INTO ${paramTableName} (${paramColumns.join(', ')}) VALUES (${paramValues.map((value, index) => `$${index + 1}`).join(', ')}) RETURNING id`,
-            values: paramValues
-        }
-    } else if (paramQueryType === 'UPDATE') {
-        return {
-            text: `UPDATE  ${paramTableName}  SET  ${(paramColumns.map((column, index) => `${column} = $${index + 1}`).join(', '))} WHERE ${Object.keys(paramConditions).map(key => `${key} = ${paramConditions[key]}`).join(' AND ')}`,
-            values: paramValues
-        }
-    } else if (paramQueryType === 'DELETE') {
-        return {
-            text: `DELETE FROM ${paramTableName} WHERE ${Object.keys(paramConditions).map(key =>  `${key} = $${Object.keys(paramConditions).indexOf(key) + 1}`).join(' AND ')}`,
-            values: Object.values(paramConditions)
-        }
-    } else {
-        throw new Error('Invalid query type');
+        case 'INSERT':
+            const insertValues = paramValues.map((value, index) => `$${index + 1}`).join(', ');
+            return {
+                text: `INSERT INTO ${paramTableName} (${columns}) VALUES (${insertValues}) RETURNING id`,
+                values: paramValues
+            };
+        case 'UPDATE':
+            const updateColumns = paramColumns.map((column, index) => `${column} = $${index + 1}`).join(', ');
+            return {
+                text: `UPDATE ${paramTableName} SET ${updateColumns} WHERE ${Object.keys(paramConditions).map(key => `${key} = ${paramConditions[key]}`).join(' AND ')}`,
+                values: paramValues
+            };
+        case 'DELETE':
+            return {
+                text: `DELETE FROM ${paramTableName} ${whereClause}`,
+                values: Object.values(paramConditions)
+            };
+        default:
+            throw new Error('Invalid query type');
     }
 };
 
