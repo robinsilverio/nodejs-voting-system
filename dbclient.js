@@ -43,19 +43,19 @@ const executeQuery = async (queryType, paramTableName, paramColumns, paramCondit
     }
 };
 
-export const retrieve = (paramTableName, paramColumns, paramConditions) => {
+const retrieve = (paramTableName, paramColumns, paramConditions) => {
     return executeQuery('SELECT', paramTableName,  paramColumns, paramConditions)
 };
 
-export const insert = (paramTableName, paramColumns, paramValues) => {
+const insert = (paramTableName, paramColumns, paramValues) => {
     return executeQuery('INSERT',  paramTableName, paramColumns, {}, paramValues);
 };
 
-export  const update = (paramTableName, paramColumns, paramConditions, paramValues) => {
+const update = (paramTableName, paramColumns, paramConditions, paramValues) => {
     return  executeQuery('UPDATE', paramTableName, paramColumns, paramConditions, Object.values(filterId(paramValues)));
 }
 
-export const remove = (paramTableName,  paramConditions) => {
+const remove = (paramTableName,  paramConditions) => {
     return executeQuery('DELETE', paramTableName, [], paramConditions);
 }
 
@@ -107,8 +107,17 @@ export const existsInDatabase = async (paramTableName, paramConditions) => {
     return result.rows.length >  0 ? result.rows[0] : null;
 }   
 
+export const retrieveFromTable = async(paramTableName, paramConditions) => {
+    return await retrieve(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()], paramConditions);
+}
 export const insertIntoTable = async (paramTableName, paramData) => {
     return await insert(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()].filter(column => column !== 'id'), Object.values(filterId(paramData)));
+}
+export const updateFromTable = async (paramTableName, paramData) => {
+    await update(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()].filter(column => column !== 'id'), { id: paramData.id }, paramData);
+}
+export const  deleteFromTable = async (paramTableName, paramId) => {
+    await remove(paramTableName, { id: paramId });
 }
 
 export default client;

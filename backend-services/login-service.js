@@ -2,15 +2,13 @@ import { statusCodes } from "../src/enums/status-codes.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { getRequestBody, sendResponse } from "../server-routes.js";
-import { retrieve } from "../dbclient.js";
-import { tableColumnsPerTable } from "../src/enums/tablecolumnspertable.js";
+import { retrieveFromTable } from "../dbclient.js";
 
 export const performLogin = async (paramReq, paramRes) => {
     
     let requestBody = await getRequestBody(paramReq);
     let loginDetails = { user : null, loggedIn: false };
-    
-    const result = await retrieve('admin', tableColumnsPerTable.ADMIN, { username: requestBody.username });
+    const result = await retrieveFromTable('admin', { username: requestBody.username })
     const retrievedUser = result.rows[0];
     
     if (retrievedUser !== undefined) {
