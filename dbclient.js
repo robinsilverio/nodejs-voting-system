@@ -33,40 +33,29 @@ export const closeDatabaseConnection = (done) => {
         });
 };
 
-export const retrieve = (paramTableName, paramColumns, paramConditions) => {
-
+const executeQuery = async (queryType, paramTableName, paramColumns, paramConditions = {}, paramValues = {}) => {
     try {
-        return client.query(returnQuery('SELECT', paramTableName, paramColumns, paramConditions));
+        const query = returnQuery(queryType, paramTableName, paramColumns, paramConditions, paramValues);
+        return await client.query(query);
     } catch (err) {
-        console.error('Error retrieving records from database', err);
-        throw err;
+        throw new Error(`Error executing ${queryType} operation: ${err.message}`);
     }
+};
+
+export const retrieve = (paramTableName, paramColumns, paramConditions) => {
+    return executeQuery('SELECT', paramTableName,  paramColumns, paramConditions)
 };
 
 export const insert = (paramTableName, paramColumns, paramValues) => {
-
-    console.log(returnQuery('INSERT', paramTableName, paramColumns, {}, paramValues));
-    try {
-        return client.query(returnQuery('INSERT', paramTableName, paramColumns, {}, paramValues));
-    }  catch (err) {
-        throw new Error('Error inserting record into database', err);
-    }
+    return executeQuery('INSERT',  paramTableName, paramColumns, {}, paramValues);
 };
 
 export  const update = (paramTableName, paramColumns, paramConditions, paramValues) => {
-    try {
-        return client.query(returnQuery('UPDATE', paramTableName, paramColumns, paramConditions, paramValues));
-    }  catch (err) {
-        throw new Error('Error updating record ', err);
-    }
+    return  executeQuery('UPDATE', paramTableName, paramColumns, paramConditions, Object.values(filterId(paramValues)));
 }
 
 export const remove = (paramTableName,  paramConditions) => {
-    try {
-        return client.query(returnQuery('DELETE', paramTableName, [], paramConditions));
-    } catch (err) {
-        throw new Error('Error deleting record from database', err);
-    }
+    return executeQuery('DELETE', paramTableName, [], paramConditions);
 }
 
 const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditions = {},  paramValues = {}) => {
@@ -88,7 +77,7 @@ const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditio
         }
     } else if (paramQueryType === 'UPDATE') {
         return {
-            text: `UPDATE  ${paramTableName}  SET  ${(paramColumns.map((column, index) => `${column} = $${index + 1}`).join(', '))} WHERE ${Object.keys(paramConditions).map(key => `${key} = ${Object.keys(paramConditions).indexOf(key) + 1}`).join(' AND ')}`,
+            text: `UPDATE  ${paramTableName}  SET  ${(paramColumns.map((column, index) => `${column} = $${index + 1}`).join(', '))} WHERE ${Object.keys(paramConditions).map(key => `${key} = ${paramConditions[key]}`).join(' AND ')}`,
             values: paramValues
         }
     } else if (paramQueryType === 'DELETE') {
@@ -113,8 +102,7 @@ export const existsInDatabase = async (paramTableName, paramConditions) => {
 }   
 
 export const insertIntoTable = async (paramTableName, paramData) => {
-    const data = filterId(paramData);
-    return await insert(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()].filter(column => column !== 'id'), Object.values(data));
+    return await insert(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()].filter(column => column !== 'id'), Object.values(filterId(paramData)));
 }
 
 export default client;

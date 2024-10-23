@@ -40,17 +40,14 @@ export const performCreateElection = async(paramReq, paramRes) => {
 
 }
 
-export const  performUpdateElection = async(paramReq, paramRes) => {
+export const performUpdateElection = async(paramReq, paramRes) => {
     try {
         let requestBody = await getRequestBody(paramReq);
 
-        if (!await electionExists(null, requestBody.id)) {
+        if (!await existsInDatabase('election', { id: requestBody.id })) {
             return sendResponse(paramRes, statusCodes.NOT_FOUND, 'Election not found.');
         } else {
-            requestBody = Object.fromEntries(
-                Object.entries(requestBody).filter(([key]) => key !== 'id') // Filter out 'id'
-            );
-            const updatedElection = await update('election', tableColumnsPerTable.ELECTION.filter(column => column !== 'id'), { id: requestBody.id }, Object.values(requestBody));
+            const updatedElection = await update('election', tableColumnsPerTable.ELECTION.filter(column => column !== 'id'), { id: requestBody.id }, requestBody);
             return sendResponse(paramRes, statusCodes.SUCCESS, 'Updating election was successful.');
         }
     } catch (error) {
@@ -63,10 +60,9 @@ export const performDeleteElection = async (paramReq, paramRes) => {
     try {
         if (!await existsInDatabase('election', { id: paramReq.query.id } )) {
             return sendResponse(paramRes, statusCodes.NOT_FOUND, 'Election not found.');
-        } else {
-            await remove('election', { id: paramReq.query.id });
-            return sendResponse(paramRes, statusCodes.SUCCESS, 'Election was successfully deleted.');
         }
+        await remove('election', { id: paramReq.query.id });
+        return sendResponse(paramRes, statusCodes.SUCCESS, 'Election was successfully deleted.');
     } catch (error) {
         console.error(error);
         return sendResponse(paramRes,  statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong with the server');
