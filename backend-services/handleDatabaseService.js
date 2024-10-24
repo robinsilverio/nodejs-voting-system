@@ -8,61 +8,31 @@ export class HandleDatabaseService {
         this.entity = paramTableName;
     }
 
-    async retrieve(paramRes) {
-        try {
-            const result = await retrieveFromTable(this.entity, {});
-            return sendResponse(paramRes, statusCodes.SUCCESS,  result);
-        } catch (error) {
-            console.log(error);
-            return  sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong while retrieving from database');
+    async retrieve(paramConditions = {}) {
+        const result = await retrieveFromTable(this.entity, paramConditions);
+        return result;
+    }
+
+    async create(paramRequestBody) {
+        const result = await insertIntoTable(`${this.entity}`, paramRequestBody);
+        return result;
+    }
+
+    async update(paramRequestBody) {
+        if (!await existsInDatabase(this.entity, { id: paramRequestBody.id })) {
+            return { statusCode: statusCodes.NOT_FOUND, data: `${this.entity} not found.` };
+        } else {
+            const updatedEntity = await updateFromTable(this.entity, paramRequestBody);
+            return { statusCode: statusCodes.SUCCESS, data: `Updating ${this.entity} was successful.` };
         }
     }
 
-    async create(paramReq, paramRes) {
-        try {
-            const requestBody = await getRequestBody(paramReq);
-
-            const nameField = `${this.entity}_name`;
-    
-            if (await existsInDatabase(this.entity, { [nameField] : requestBody[nameField] })) {
-                return sendResponse(paramRes, statusCodes.BAD_REQUEST, `${this.entity} already exists.`);
-            }
-            
-            const election = await insertIntoTable(`${this.entity}`, requestBody);
-            return sendResponse(paramRes, statusCodes.SUCCESS, `${this.entity} successfully created.`);
-        } catch (error) {
-            console.error(error);
-            return sendResponse(paramRes,  statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong with the server.');
+    async delete(paramId) {
+        if (!await existsInDatabase(this.entity, { id: paramId } )) {
+            return { statusCode: statusCodes.NOT_FOUND, data: `${this.entity} not found.` };
         }
-    }
-
-    async update(paramReq, paramRes) {
-        try {
-            let requestBody = await getRequestBody(paramReq);
-
-            if (!await existsInDatabase(this.entity, { id: requestBody.id })) {
-                return sendResponse(paramRes, statusCodes.NOT_FOUND, `${this.entity} not found.`);
-            } else {
-                const updatedEntity = await updateFromTable(this.entity, requestBody);
-                return sendResponse(paramRes, statusCodes.SUCCESS, `Updating ${this.entity} was successful.`);
-            }
-        } catch (error) {
-            console.error(error);
-            return sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong with the server.');
-        }
-    }
-
-    async delete(paramReq, paramRes) {
-        try {
-            if (!await existsInDatabase(this.entity, { id: paramReq.query.id } )) {
-                return sendResponse(paramRes, statusCodes.NOT_FOUND, `${this.entity} not found.`);
-            }
-            await deleteFromTable(this.entity, paramReq.query.id);
-            return sendResponse(paramRes, statusCodes.SUCCESS, `${this.entity} was successfully deleted.`);
-        } catch (error) {
-            console.error(error);
-            return sendResponse(paramRes,  statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong with the server');
-        }
+        await deleteFromTable(this.entity, paramId);
+        return { statusCode: statusCodes.SUCCESS, data: `${this.entity} was successfully deleted.` };
     }
 
 }

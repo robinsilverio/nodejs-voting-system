@@ -1,19 +1,20 @@
 import { statusCodes } from "../src/enums/status-codes.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { getRequestBody, sendResponse } from "../server-routes.js";
-import { retrieveFromTable } from "../dbclient.js";
+import { HandleDatabaseService } from "./handleDatabaseService.js";
 
-export const performLogin = async (paramReq, paramRes) => {
+const handleDatabaseService = new HandleDatabaseService('admin');
+
+export const performLogin = async (paramRequestBody) => {
     
-    let requestBody = await getRequestBody(paramReq);
     let loginDetails = { user : null, loggedIn: false };
-    const result = await retrieveFromTable('admin', { username: requestBody.username })
+    const result  = await handleDatabaseService.retrieve({ username: paramRequestBody.username });
+
     const retrievedUser = result.rows[0];
     
     if (retrievedUser !== undefined) {
         
-        const isValidPassword = await bcrypt.compare(requestBody.password, retrievedUser.password);
+        const isValidPassword = await bcrypt.compare(paramRequestBody.password, retrievedUser.password);
         if (isValidPassword) {
             loginDetails.user = {
                 id: retrievedUser.id,
@@ -26,33 +27,38 @@ export const performLogin = async (paramReq, paramRes) => {
             loginDetails.loggedIn = true;
             loginDetails.token = token;
 
-            return sendResponse(paramRes, statusCodes.SUCCESS, JSON.stringify({ loginDetails }));
+            return { statusCode: statusCodes.SUCCESS, data: { loginDetails } };
         }
-        return sendResponse(paramRes, statusCodes.UNAUTHORIZED, 'Username or password is incorrect.');
+        return { statusCode: statusCodes.UNAUTHORIZED, data: 'Username or password is incorrect.' };
     } else {
-        return sendResponse(paramRes, statusCodes.UNAUTHORIZED, 'Username or password is incorrect.');
+        return { statusCode: statusCodes.UNAUTHORIZED, data: 'Username or password is incorrect.' };
     }
 };
 
-export const performJwtValidation = (paramReq, paramRes) => {
-    
-    const authHeader = paramReq.headers['authorization'];
-    if (!authHeader) {
-        return sendResponse(paramRes, statusCodes.FORBIDDEN, { message: 'No token provided' });
+export const performJwtValidation = (paramAuthHeader) => {
+
+    let response;
+
+    if (!paramAuthHeader) {
+        response = { statusCode: statusCodes.FORBIDDEN, data: 'No token provided' };
     }
 
     // Extract the token from the header
-    const token = authHeader.split(' ')[1];
+    const token = paramAuthHeader.split(' ')[1];
 
     // Verify the token
     jwt.verify(token, `${process.env.JWT_SECRET_KEY}`, (err, decoded) => {
         if (err) {
-            return sendResponse(paramRes, statusCodes.UNAUTHORIZED, { message: 'Invalid or expired token' });
+            console.log(err);
+            response = { statusCode: statusCodes.UNAUTHORIZED, data: 'Invalid or expired token' };
+            return response;
         }
 
         // Token is valid, return the role or any other necessary info
-        return sendResponse(paramRes, statusCodes.SUCCESS, { role: decoded.role })
+        response = { statusCode: statusCodes.SUCCESS, data: { role: decoded.role } }
     });
+
+    return response;
 }
 
 export const signJwt = (paramBody, paramExpiresIn='1h') => {

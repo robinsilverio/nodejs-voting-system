@@ -21,11 +21,11 @@ router.post('/register-voter', (req, res) => registerVoter(req, res));
 router.get('/validate-jwt', (req, res) => validateJwt(req, res));
 router.get('/validate-voter-token',  (req, res) => validateVoterToken(req, res));
 router.post('/elections', (req, res) =>  createElection(req, res));
-router.get('/elections',  (req, res) => retrieveElections(req, res));
+router.get('/elections',  (req, res) => retrieveElections(res));
 router.put('/elections',  (req, res) => updateElection(req, res));
 router.delete('/elections', (req, res) => deleteElection(req, res));
 router.post('/candidates', (req, res) => createCandidate(req, res));
-router.get('/candidates', (req, res) => retrieveCandidates(req, res));
+router.get('/candidates', (req, res) => retrieveCandidates(res));
 router.put('/candidates', (req, res) => updateCandidate(req, res));
 router.delete('/candidates', (req, res) => deleteCandidate(req, res));
 
