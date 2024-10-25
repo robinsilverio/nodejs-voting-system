@@ -13,8 +13,8 @@ export const performRegisteringVoter = async(paramRequestBody) => {
             return { statusCode: statusCodes.BAD_REQUEST,  data: 'token is invalid or in use.' };
         }
 
-        const result = await insertIntoTable('voter', { token_id : validToken.id });        
-        const jwtToken = signJwt(result.rows[0], '1d');
+        const result = await insertIntoTable('voter', { token_id : validToken.id });   
+        const jwtToken = signJwt({id : result.rows[0].id, role: 'VOTER' }, '1d');
         return { statusCode: statusCodes.SUCCESS, data: jwtToken };
 
     } catch(error) {

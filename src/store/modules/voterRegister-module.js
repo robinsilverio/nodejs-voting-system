@@ -12,9 +12,6 @@ export const voterRegisterModule = {
             sessionStorage.setItem('authToken', payload);
         }
     },
-    getters: {
-
-    },
     actions: {
         registerVoter({ commit }, payload) {
             return voterRegisterService.registerVoter(payload)
