@@ -38,5 +38,14 @@ export default {
       background-color: #007bff; /* Switch background color to blue on hover */
       color: #ffffff; /* Switch text color to white for better contrast */
   }
+  button.modify, .button.delete {
+    color: #FFF;
+  }
+  .button.modify {
+    background-color: #928b8b;
+  }
+  .button.delete {
+    background-color: red;
+  }
 
 </style>
