@@ -1,14 +1,17 @@
 <template>
     <HeaderComponent></HeaderComponent>
     <div class="dashboard-container">
-        <div class="dashboard-buttons">
+        <div class="dashboard-buttons" v-if="this.buttonStatus == null">
             <div class="button" @click="this.openCRUDContainer(button)" v-for="button of this.dashboardButtons" :key="button.id">
                 <img :src="button.iconSrc" alt="" height="150" width="150">
                 {{ button.value }}
             </div>
         </div>
         <div class="CRUD-area" v-if="this.buttonStatus !== null">
-            <h1>{{ this.buttonStatus.title }}</h1>
+            <div class="CRUD-area-header">
+                <h1>{{ this.buttonStatus.title }}</h1>
+                <a @click="this.closeCRUDContainer()">Return to dashboard.</a>
+            </div>
             <ul>
                 <li v-if="getItems.length == 0">No {{ this.buttonStatus.singularName }} available.</li>
                 <li v-else v-for="item in getItems" :key="item.id">
@@ -62,6 +65,9 @@ export default {
             }
             this.itemName = `${paramButton.name.singular}_name`;
             store.dispatch('loadItems', paramButton.name.plural);
+        },
+        closeCRUDContainer() {
+            this.buttonStatus = null;
         },
         deleteItem(paramId, paramEntity) {
             store.dispatch('deleteItem', { id: paramId, entity: paramEntity } );
@@ -129,5 +135,12 @@ export default {
 
     .dashboard-container .CRUD-area ul li p {
         cursor: pointer;
+    }
+    .dashboard-container .CRUD-area .CRUD-area-header {
+        display: flex;
+        justify-content: space-between; /* Align horizontally to the right */
+        align-items: center;
+        height: 100px; 
+        padding-right: 20px;
     }
 </style>

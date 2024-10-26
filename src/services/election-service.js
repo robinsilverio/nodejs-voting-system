@@ -5,9 +5,9 @@ export class ElectionService {
     electionApiUrl = `${this.baseAPIUrl}/elections`;
     
     loadElections() {
-        return axios.get(this.electionApiUrl, {headers: {'authorization' : `Bearer  ${sessionStorage.getItem('authToken')}`}});
+        return axios.get(this.electionApiUrl, {headers: {'Authorization' : `Bearer ${sessionStorage.getItem('authToken')}`}});
     }
     deleteElection(paramId) {
-        return axios.delete(`${this.electionApiUrl}?id=${paramId}`, {headers: {'authorization' : `Bearer  ${sessionStorage.getItem('authToken')}`}});
+        return axios.delete(`${this.electionApiUrl}?id=${paramId}`, {headers: {'Authorization' : `Bearer ${sessionStorage.getItem('authToken')}`}});
     }
 }

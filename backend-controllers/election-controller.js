@@ -11,7 +11,6 @@ import { existsInDatabase } from "../dbclient.js";
 export async function retrieveElections(paramRes) {
     try {
         const result = await performRetrieveElections();
-        console.log(result);
         return sendResponse(paramRes, statusCodes.SUCCESS, result.rows);
     } catch (error) {
         console.error(error);

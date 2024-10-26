@@ -5,7 +5,7 @@ export class CandidateService {
     candidatesApiUrl = `${this.baseAPIUrl}/candidates`;
 
     loadCandidates() {
-        return axios.get(this.candidatesApiUrl, { headers: { 'authorization': `Bearer  ${sessionStorage.getItem('authToken')}`}});
+        return axios.get(this.candidatesApiUrl, { headers: { 'authorization': `Bearer ${sessionStorage.getItem('authToken')}`}});
     }
     deleteCandidate(paramId) {
         return axios.delete(`${this.candidatesApiUrl}?id=${paramId}`, { headers: { 'authorization' : `Bearer ${sessionStorage.getItem('authToken')}`}})

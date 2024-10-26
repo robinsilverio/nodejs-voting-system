@@ -13,21 +13,22 @@ import {
     retrieveCandidates, 
     updateCandidate 
 } from './backend-controllers/candidate-controller.js';
+import { authorizeJwt } from './middleware/auth-middleware.js';
 
 const router = e.Router();
 
 router.post('/login', (req, res) => login(req, res));
 router.post('/register-voter', (req, res) => registerVoter(req, res));
 router.get('/validate-jwt', (req, res) => validateJwt(req, res));
-router.get('/validate-voter-token',  (req, res) => validateVoterToken(req, res));
-router.post('/elections', (req, res) =>  createElection(req, res));
-router.get('/elections',  (req, res) => retrieveElections(res));
-router.put('/elections',  (req, res) => updateElection(req, res));
-router.delete('/elections', (req, res) => deleteElection(req, res));
-router.post('/candidates', (req, res) => createCandidate(req, res));
-router.get('/candidates', (req, res) => retrieveCandidates(res));
-router.put('/candidates', (req, res) => updateCandidate(req, res));
-router.delete('/candidates', (req, res) => deleteCandidate(req, res));
+router.get('/validate-voter-token', (req, res) => validateVoterToken(req, res));
+router.post('/elections', authorizeJwt, (req, res) =>  createElection(req, res));
+router.get('/elections', authorizeJwt, (req, res) => retrieveElections(res));
+router.put('/elections', authorizeJwt, (req, res) => updateElection(req, res));
+router.delete('/elections', authorizeJwt, (req, res) => deleteElection(req, res));
+router.post('/candidates', authorizeJwt, (req, res) => createCandidate(req, res));
+router.get('/candidates', authorizeJwt, (req, res) => retrieveCandidates(res));
+router.put('/candidates', authorizeJwt, (req, res) => updateCandidate(req, res));
+router.delete('/candidates', authorizeJwt, (req, res) => deleteCandidate(req, res));
 
 
 
