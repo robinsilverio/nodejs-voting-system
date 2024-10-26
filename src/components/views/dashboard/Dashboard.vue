@@ -10,13 +10,14 @@
         <div class="CRUD-area" v-if="this.buttonStatus !== null">
             <h1>{{ this.buttonStatus.title }}</h1>
             <ul>
-                <li v-for="item in getItems" :key="item.id">
+                <li v-if="getItems.length == 0">No {{ this.buttonStatus.singularName }} available.</li>
+                <li v-else v-for="item in getItems" :key="item.id">
                     <p>{{ item[this.itemName] }}</p>
                     <div class="action-buttons">
-                        <button type="button" class="button modify">
+                        <button type="button" class="button modify" @click="this.openModifyModal(item)">
                             modify
                         </button>
-                        <button type="button" class="button delete">
+                        <button type="button" class="button delete" @click="this.deleteItem(item.id, this.buttonStatus.entity)">
                             remove
                         </button>
                     </div>
@@ -55,11 +56,16 @@ export default {
     methods: {
         openCRUDContainer(paramButton) {
             this.buttonStatus = {
-                title: paramButton.value
+                title: paramButton.value,
+                entity: paramButton.name.plural,
+                singularName: paramButton.name.singular,
             }
             this.itemName = `${paramButton.name.singular}_name`;
             store.dispatch('loadItems', paramButton.name.plural);
-        }
+        },
+        deleteItem(paramId, paramEntity) {
+            store.dispatch('deleteItem', { id: paramId, entity: paramEntity } );
+        }   
     }
 };
 </script>

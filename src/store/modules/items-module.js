@@ -17,13 +17,13 @@ export const itemsModule = {
         items: (state) => state.items
     },
     actions: {
-        loadItems({ commit }, buttonName) {
-
+        loadItems({ commit }, paramEntity) {
+            
             function handleSuccess(commit, success) {
                 commit('SET_ITEMS', success.data);
             }
-            
-            switch (buttonName) {
+
+            switch (paramEntity) {
                 case 'candidates':
                     candidateService.loadCandidates()
                     .then((success) => handleSuccess(commit, success))
@@ -36,6 +36,24 @@ export const itemsModule = {
                     break;
                 default:
                     commit('SET_ITEMS', []);
+                    break;
+            }
+        },
+        deleteItem({ commit }, paramObject) {
+            switch (paramObject.entity) {
+                case 'candidates':
+                    console.log('Delete candidate.');
+                    candidateService.deleteCandidate(paramObject.id)
+                    .then((success) => this.dispatch('loadItems', paramObject.entity))
+                    .catch((error) => console.error(error));
+                    break;
+                case 'elections':
+                    console.log('Delete election.');
+                    electionService.deleteElection(paramObject.id)
+                    .then((success) => this.dispatch('loadItems', paramObject.entity))
+                    .catch((error) => console.error(error));
+                    break;
+                default:
                     break;
             }
         }
