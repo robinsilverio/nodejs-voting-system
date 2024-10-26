@@ -1,7 +1,7 @@
 import { statusCodes } from "../src/enums/status-codes.js";
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { HandleDatabaseService } from "./handleDatabaseService.js";
+import { signJwt, validateJwtToken } from "../utils/jwtUtils.js";
 
 const handleDatabaseService = new HandleDatabaseService('admin');
 
@@ -35,32 +35,12 @@ export const performLogin = async (paramRequestBody) => {
     }
 };
 
-export const performJwtValidation = (paramAuthHeader) => {
+export const performJwtValidation = (authHeader) => {
+    const tokenValidationResult = validateJwtToken(authHeader);
 
-    let response;
-
-    if (!paramAuthHeader) {
-        response = { statusCode: statusCodes.FORBIDDEN, data: 'No token provided' };
+    if (tokenValidationResult.statusCode !== statusCodes.SUCCESS) {
+        return { statusCode: tokenValidationResult.statusCode, data: tokenValidationResult.data };
     }
 
-    // Extract the token from the header
-    const token = paramAuthHeader.split(' ')[1];
-
-    // Verify the token
-    jwt.verify(token, `${process.env.JWT_SECRET_KEY}`, (err, decoded) => {
-        if (err) {
-            console.log(err);
-            response = { statusCode: statusCodes.UNAUTHORIZED, data: 'Invalid or expired token' };
-            return response;
-        }
-
-        // Token is valid, return the role or any other necessary info
-        response = { statusCode: statusCodes.SUCCESS, data: { role: decoded.role } }
-    });
-
-    return response;
-}
-
-export const signJwt = (paramBody, paramExpiresIn='1h') => {
-    return jwt.sign(paramBody, `${process.env.JWT_SECRET_KEY}`, { expiresIn: paramExpiresIn });
-}
+    return { statusCode: statusCodes.SUCCESS, data: { role: tokenValidationResult.data.role } };
+};

@@ -1,6 +1,6 @@
 import { statusCodes } from "../src/enums/status-codes.js";
 import { existsInDatabase, insertIntoTable } from "../dbclient.js";
-import { signJwt } from "./login-service.js";
+import { signJwt } from "../utils/jwtUtils.js";
 
 export const performRegisteringVoter = async(paramRequestBody) => {
 
