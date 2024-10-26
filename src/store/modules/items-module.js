@@ -24,12 +24,12 @@ export const itemsModule = {
             }
 
             switch (paramEntity) {
-                case 'candidates':
+                case 'candidate':
                     candidateService.loadCandidates()
                     .then((success) => handleSuccess(commit, success))
                     .catch((error) => console.error(error));
                     break;
-                case 'elections':
+                case 'election':
                     electionService.loadElections()
                     .then((success) => handleSuccess(commit, success))
                     .catch((error) => console.error(error));
@@ -41,13 +41,13 @@ export const itemsModule = {
         },
         deleteItem({ commit }, paramObject) {
             switch (paramObject.entity) {
-                case 'candidates':
+                case 'candidate':
                     console.log('Delete candidate.');
                     candidateService.deleteCandidate(paramObject.id)
                     .then((success) => this.dispatch('loadItems', paramObject.entity))
                     .catch((error) => console.error(error));
                     break;
-                case 'elections':
+                case 'election':
                     console.log('Delete election.');
                     electionService.deleteElection(paramObject.id)
                     .then((success) => this.dispatch('loadItems', paramObject.entity))

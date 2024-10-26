@@ -12,12 +12,13 @@
                 <h1>{{ this.buttonStatus.title }}</h1>
                 <a @click="this.closeCRUDContainer()">Return to dashboard.</a>
             </div>
+            <button class="button success" @click="this.openForm('CREATE', null)">Create {{ this.buttonStatus.entity }}</button>
             <ul>
-                <li v-if="getItems.length == 0">No {{ this.buttonStatus.singularName }} available.</li>
+                <li v-if="getItems.length == 0">No {{ this.buttonStatus.entity }} available.</li>
                 <li v-else v-for="item in getItems" :key="item.id">
                     <p>{{ item[this.itemName] }}</p>
                     <div class="action-buttons">
-                        <button type="button" class="button modify" @click="this.openModifyModal(item)">
+                        <button type="button" class="button modify" @click="this.openForm('UPDATE', item)">
                             modify
                         </button>
                         <button type="button" class="button delete" @click="this.deleteItem(item.id, this.buttonStatus.entity)">
@@ -27,17 +28,20 @@
                 </li>
             </ul>
         </div>
+        <CRUDFormComponent v-if="this.isFormOpen" :entity="this.buttonStatus.entity" :crudFunction="this.crudFunction" :item="this.item" @closeForm="closeForm" ></CRUDFormComponent>
     </div>
 </template>
 <script>
 
 import { store } from '@/store';
 import HeaderComponent from '../../header/Header.vue';
+import CRUDFormComponent from './related-components/CRUDForm.vue';
 
 export default {
     name: 'DashboardComponent',
     components: {
         HeaderComponent,
+        CRUDFormComponent
     },
     computed: {
         getItems() {
@@ -53,24 +57,34 @@ export default {
                 { id: 3, name: 'manage-ballots', value: 'Manage ballots', iconSrc: require('../../../assets/icons/Transparent_Manage_ballots.png') },
                 { id: 4, name: 'view-results', value: 'View results per election', iconSrc: require('../../../assets/icons/Transparent_View_results_per_election.png') }
             ],
-            buttonStatus: null
+            buttonStatus: null,
+            isFormOpen: false,
+            crudFunction: null,
+            item: null
         }
     },
     methods: {
         openCRUDContainer(paramButton) {
             this.buttonStatus = {
                 title: paramButton.value,
-                entity: paramButton.name.plural,
-                singularName: paramButton.name.singular,
+                entity: paramButton.name.singular,
             }
             this.itemName = `${paramButton.name.singular}_name`;
-            store.dispatch('loadItems', paramButton.name.plural);
+            store.dispatch('loadItems', paramButton.name.singular);
         },
         closeCRUDContainer() {
             this.buttonStatus = null;
         },
         deleteItem(paramId, paramEntity) {
             store.dispatch('deleteItem', { id: paramId, entity: paramEntity } );
+        },
+        openForm(paramFunction, paramObj) {
+            this.item = paramObj;
+            this.crudFunction = paramFunction
+            this.isFormOpen = true;
+        },
+        closeForm(paramValue) {
+            this.isFormOpen = false;
         }   
     }
 };
@@ -138,7 +152,7 @@ export default {
     }
     .dashboard-container .CRUD-area .CRUD-area-header {
         display: flex;
-        justify-content: space-between; /* Align horizontally to the right */
+        justify-content: space-between;
         align-items: center;
         height: 100px; 
         padding-right: 20px;

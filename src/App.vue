@@ -10,7 +10,10 @@ export default {
 
 <style>
   :root {
-    --login-width: 35%;
+    --login-width: 33%;
+    --form-width: 50%;
+    --main-width: 80%;
+    --full-width: 100%;
     --main-background-color: #2c3e50;
     --secondary-background-color: #199ef9;
     --regular-padding: 15px;
@@ -25,24 +28,30 @@ export default {
     height: 100vh;
   }
   button, .button {
-      background-color: #ffffff; /* White background for contrast */
-      color: #007bff; /* Blue text to match the overall theme */
-      padding: 10px 20px; /* Padding for a balanced size */
-      border: 2px solid #007bff; /* Blue border to keep the theme consistent */
-      border-radius: 5px; /* Slightly rounded corners for a modern look */
-      font-weight: bold; /* Bold text for emphasis */
-      cursor: pointer; /* Pointer cursor on hover */
-      transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for hover effects */
+      background-color: #ffffff;
+      color: #007bff;
+      padding: 10px 20px;
+      border: 2px solid #007bff;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
   }
   button:hover, .button:hover {
-      background-color: #007bff; /* Switch background color to blue on hover */
-      color: #ffffff; /* Switch text color to white for better contrast */
+      background-color: #007bff;
+      color: #ffffff;
   }
-  button.modify, .button.delete {
+  .button.success, button.modify, .button.delete {
     color: #FFF;
   }
   .button.modify {
     background-color: #928b8b;
+  }
+  .button.success {
+    background-color: #49cc49;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .button.delete {
     background-color: red;
