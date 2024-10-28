@@ -7,7 +7,7 @@
         <button type="button" @click="register()">Registreer</button>
     </div> 
     <div class="error-messages-container">
-        <span v-for="(errorMessage, key) of this.onFormInvalid" :key="key" >{{ errorMessage }}</span>
+        <p v-for="(errorMessage, key) of this.onFormInvalid" :key="key" >{{ errorMessage }}</p>
     </div>
 </template>
 <script>
@@ -23,7 +23,7 @@ import { validateInputs } from '@/utils/validators/validators';
                     votersRegisterForm : {
                         inputFields: [
                             {
-                                fieldName: 'token',
+                                name: 'token',
                                 label: 'Token',
                                 value: null
                             }

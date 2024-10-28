@@ -8,20 +8,24 @@
         <form>
             <div v-for="(field, index) in getInputFields" :key="index">
                 <label>{{ field.label }}</label>
-                <input v-if="field.type === 'text'" :type="field.type" :name="field.name" v-model="field.value" />
-                <textarea v-if="field.type === 'textarea'" :name="field.name" v-model="field.value"></textarea>
-                <select v-if="field.type === 'dropDown'" :name="field.name" v-model="field.value">
+                <input v-if="field.type === 'text'" :type="field.type" :name="field.name" v-model="field.value" v-on:focus="this.clearErrorMessages()" />
+                <textarea v-if="field.type === 'textarea'" :name="field.name" v-model="field.value" v-on:focus="this.clearErrorMessages()" ></textarea>
+                <select v-if="field.type === 'dropDown'" :name="field.name" v-model="field.value" v-on:focus="this.clearErrorMessages()" >
                     <option value="">Select an option</option>
                     <option v-for="(option, index) in field.options" :key="index" :value="option">{{ option }}</option>
                 </select>
-                <input v-if="field.type === 'date'" :type="field.type" :name="field.name" v-model="field.value" />
+                <input v-if="field.type === 'date'" :type="field.type" :name="field.name" v-model="field.value" v-on:focus="this.clearErrorMessages()" />
             </div>
             <button type="button" @click="this.submitForm" class="button success">{{ this.getText }}</button>
         </form>
+        <div class="error-messages-container">
+            <p v-for="(errorMessage, key) of this.onFormInvalid" :key="key" >{{ errorMessage }}</p>
+        </div>
     </div>
 </template>
 <script>
-    import { store } from '@/store';
+import { store } from '@/store';
+import { validateInputs } from '@/utils/validators/validators';
 
     export default {
         name: 'CRUDFormComponent',
@@ -38,8 +42,9 @@
         },
         data() {
             return {
+                errorMessages: [],
                 form: {
-                    CANDIDATE: {
+                    candidateForm: {
                         inputFields: [
                             {name: 'candidate_name', label: 'Candidate name', type: 'text', value: this.item ? this.item.candidate_name : ''},
                             {name: 'party_filiation', label: 'Party filiation', type: 'text', value: this.item ? this.item.party_filiation : ''},
@@ -47,7 +52,7 @@
                             {name: 'runs_for', label: 'Runs for', type: 'text', value: this.item ? this.item.runs_for : ''},
                         ]
                     },
-                    ELECTION: {
+                    electionForm: {
                         inputFields: [
                             {name: 'election_name', type: 'text', label: 'Election name',  value: this.item ? this.item.election_name : ''},
                             {name: 'election_description', type: 'textarea', label: 'Election description',  value: this.item ? this.item.election_description : ''},
@@ -80,14 +85,25 @@
                 }
             },
             submitForm() {
-                const entityData = this.determineEntity(this.form[this.entity.toUpperCase()].inputFields.reduce((paramDataToBeCreated,  field) => {
+
+                this.clearErrorMessages();
+
+                let currentForm = `${this.entity}Form`;
+                let errors = validateInputs({ [currentForm] : this.form[currentForm]});
+
+                if (errors.length > 0) {
+                    errors.forEach(error => this.errorMessages.push(error));
+                    return;
+                }
+
+                const entityData = this.determineEntity(this.form[currentForm].inputFields.reduce((paramDataToBeCreated,  field) => {
                     paramDataToBeCreated[field.name] = field.value;
                     return paramDataToBeCreated;
                 }, {}))[this.entity.toUpperCase()];
 
                 store.dispatch('determineFormMutation', { entity: this.entity, data: entityData, crudFunction: this.crudFunction})
-                .then((success) => this.$emit('closeForm', false))
-                .catch((error) => console.error(error));
+                .then(() => this.$emit('closeForm', false))
+                .catch((error) => this.errorMessages.push(error.response.data));
             },
             closeForm() {
                 this.$emit('closeForm', false);
@@ -98,6 +114,9 @@
                 const month = String(d.getMonth() + 1).padStart(2, '0');
                 const day = String(d.getDate()).padStart(2, '0');
                 return `${year}-${month}-${day}`;
+            },
+            clearErrorMessages() {
+                this.errorMessages = [];
             }
         },
         computed: {
@@ -105,7 +124,11 @@
                 return this.crudFunction === 'CREATE' ? `Create ${this.entity}` : `Update ${this.entity}`;
             },
             getInputFields() {
-                return this.form[this.entity.toUpperCase()].inputFields;
+                let currentForm = `${this.entity}Form`;
+                return this.form[currentForm].inputFields;
+            },
+            onFormInvalid() {
+                return this.errorMessages;
             }
         }
     }
@@ -128,7 +151,6 @@
         border-radius: 10px;
         padding: var(--regular-padding);
         z-index: 1;
-        margin-top: 5rem;
     }
     .form-wrapper .form-header {
         display: flex;
@@ -146,7 +168,13 @@
         justify-content: space-around;
         flex-direction: column;
     }
+    .form-wrapper form div textarea {
+        height: 150px;
+    }
     .form-wrapper form button {
+        margin-top: 20px;
+    }
+    .error-messages-container{
         margin-top: 20px;
     }
 </style>

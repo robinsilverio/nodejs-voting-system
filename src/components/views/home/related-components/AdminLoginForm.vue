@@ -11,7 +11,7 @@
         <button type="button" @click="this.login()">Inloggen</button>
     </div>
     <div class="error-messages-container">
-        <span v-for="(errorMessage, key) of this.onFormInvalid" :key="key">{{ errorMessage }}</span>
+        <p v-for="(errorMessage, key) of this.onFormInvalid" :key="key">{{ errorMessage }}</p>
     </div>
 </template>
 <script>
@@ -32,13 +32,13 @@
                         inputFields: [
                             {
                                 type: 'text',
-                                fieldName : 'username',
+                                name : 'username',
                                 label: 'Username',
                                 value : null,
                             },
                             {
                                 type: 'password',
-                                fieldName : 'password',
+                                name : 'password',
                                 label: 'Password',
                                 value : null
                             }
