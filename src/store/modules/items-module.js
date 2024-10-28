@@ -7,6 +7,10 @@ const candidateService = new CandidateService();
 export const itemsModule = {
     state: () => ({
         items: [],
+        entityServices: {
+            'CANDIDATE': candidateService,
+            'ELECTION': electionService
+        }
     }),
     mutations: {
         SET_ITEMS(state, items) {
@@ -14,7 +18,8 @@ export const itemsModule = {
         },
     },
     getters: {
-        items: (state) => state.items
+        items: (state) => state.items,
+        entityServices: (state) => state.entityServices,
     },
     actions: {
         loadItems({ commit }, paramEntity) {
@@ -23,39 +28,37 @@ export const itemsModule = {
                 commit('SET_ITEMS', success.data);
             }
 
-            switch (paramEntity) {
-                case 'candidate':
-                    candidateService.loadCandidates()
-                    .then((success) => handleSuccess(commit, success))
-                    .catch((error) => console.error(error));
-                    break;
-                case 'election':
-                    electionService.loadElections()
-                    .then((success) => handleSuccess(commit, success))
-                    .catch((error) => console.error(error));
-                    break;
-                default:
-                    commit('SET_ITEMS', []);
-                    break;
-            }
+            this.getters.entityServices[paramEntity.toUpperCase()].load()
+            .then((success) => handleSuccess(commit, success))
+            .catch((error) => console.error(error));
+
         },
-        deleteItem({ commit }, paramObject) {
-            switch (paramObject.entity) {
-                case 'candidate':
-                    console.log('Delete candidate.');
-                    candidateService.deleteCandidate(paramObject.id)
-                    .then((success) => this.dispatch('loadItems', paramObject.entity))
-                    .catch((error) => console.error(error));
-                    break;
-                case 'election':
-                    console.log('Delete election.');
-                    electionService.deleteElection(paramObject.id)
-                    .then((success) => this.dispatch('loadItems', paramObject.entity))
-                    .catch((error) => console.error(error));
-                    break;
-                default:
-                    break;
-            }
+        determineFormMutation({ commit, dispatch }, paramObject) {
+    
+            const entityService = this.getters.entityServices[paramObject.entity.toUpperCase()];
+
+            const actions = {
+                "CREATE": (paramObject) => entityService.create(paramObject.data),
+                "UPDATE": (paramObject) => entityService.update(paramObject.data)
+            };
+
+            console.log(paramObject.crudFunction);
+            
+            return actions[paramObject.crudFunction](paramObject)
+                .then(response => {
+                    dispatch('loadItems', paramObject.entity);
+                    return response;
+                })
+                .catch(error => {
+                    console.error('Action failed:', error);
+                    throw error;
+                });
+        },
+        deleteItem({ commit, dispatch }, paramObject) {
+            const entityService = this.getters.entityServices[paramObject.entity.toUpperCase()];
+            entityService.delete(paramObject.id)
+            .then(() => dispatch('loadItems', paramObject.entity))
+            .catch(error => console.error('Action failed:', error));
         }
     }
 };

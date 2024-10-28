@@ -9,8 +9,10 @@
         </div>
         <div class="CRUD-area" v-if="this.buttonStatus !== null">
             <div class="CRUD-area-header">
+                <div class="back-button-wrapper">
+                    <a @click="this.closeCRUDContainer()">Return to dashboard.</a>
+                </div>
                 <h1>{{ this.buttonStatus.title }}</h1>
-                <a @click="this.closeCRUDContainer()">Return to dashboard.</a>
             </div>
             <button class="button success" @click="this.openForm('CREATE', null)">Create {{ this.buttonStatus.entity }}</button>
             <ul>
@@ -152,9 +154,11 @@ export default {
     }
     .dashboard-container .CRUD-area .CRUD-area-header {
         display: flex;
+        flex-direction: column;
         justify-content: space-between;
-        align-items: center;
-        height: 100px; 
-        padding-right: 20px;
+    }
+    .dashboard-container .CRUD-area .CRUD-area-header .back-button-wrapper {
+        display: flex;
+        justify-content: flex-end;
     }
 </style>

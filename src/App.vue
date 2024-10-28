@@ -56,5 +56,9 @@ export default {
   .button.delete {
     background-color: red;
   }
+  a {
+      text-decoration: none;
+      cursor: pointer;
+  }
 
 </style>
