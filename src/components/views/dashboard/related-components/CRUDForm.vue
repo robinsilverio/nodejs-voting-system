@@ -7,7 +7,7 @@
         </div>
         <form>
             <div v-for="(field, index) in getInputFields" :key="index">
-                <label>{{ field.label }}</label>
+                <label>{{ field.label }}:</label>
                 <input v-if="field.type === 'text'" :type="field.type" :name="field.name" v-model="field.value" v-on:focus="this.clearErrorMessages()" />
                 <textarea v-if="field.type === 'textarea'" :name="field.name" v-model="field.value" v-on:focus="this.clearErrorMessages()" ></textarea>
                 <select v-if="field.type === 'dropDown'" :name="field.name" v-model="field.value" v-on:focus="this.clearErrorMessages()" >
@@ -49,8 +49,8 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
                         inputFields: [
                             {name: 'candidate_name', label: 'Candidate name', type: 'text', value: this.item ? this.item.candidate_name : ''},
                             {name: 'party_filiation', label: 'Party filiation', type: 'text', value: this.item ? this.item.party_filiation : ''},
-                            {name: 'election_id', label: 'election_id', type: 'text', value: this.item ? this.item.election_id : ''},
                             {name: 'runs_for', label: 'Runs for', type: 'text', value: this.item ? this.item.runs_for : ''},
+                            {name: 'participates_in', label: 'participates in', type: 'dropDown', options: [], value: this.item ? this.item.participates_in : ''},
                         ]
                     },
                     electionForm: {
@@ -72,8 +72,8 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
                         id: this.item ? this.item.id : null, 
                         candidate_name: paramData.candidate_name,  
                         party_filiation: paramData.party_filiation,
-                        election_id: this.item ? this.item.election_id : null,
-                        runs_for: paramData.runs_for
+                        runs_for: paramData.runs_for,
+                        participates_in: this.item ? this.item.participates_in : null,
                     },
                     'ELECTION': {
                         id: this.item ? this.item.id : null,
@@ -123,6 +123,17 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
             },
             onFormInvalid() {
                 return this.errorMessages;
+            },
+            getElectionsToBeSelected() {
+                return store.getters.getElections;
+            }
+        },
+        created() {
+            if (this.entity === 'candidate') {
+                store.dispatch('loadItems', { functionToBeCalled: 'SET_RELATED_ITEMS', entity: 'election' });
+                setTimeout(() => {
+                    this.form.candidateForm.inputFields[3].options = this.getElectionsToBeSelected.map(election => election.label);
+                }, 500);
             }
         }
     }

@@ -1,4 +1,5 @@
 import { adminLoginForm } from "./validator-modules/admin-login-form-validator.js";
+import { candidateForm } from "./validator-modules/candidate-form-validator.js";
 import { electionForm } from "./validator-modules/election-form-validator.js";
 import { votersRegisterForm } from "./validator-modules/voters-register-form-validator.js";
 
@@ -6,7 +7,8 @@ import { votersRegisterForm } from "./validator-modules/voters-register-form-val
 const validators = {
     votersRegisterForm,
     adminLoginForm,
-    electionForm
+    electionForm,
+    candidateForm
 }
 
 export const validateInputs = (paramForms) => {    

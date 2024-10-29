@@ -7,6 +7,7 @@ const candidateService = new CandidateService();
 export const itemsModule = {
     state: () => ({
         items: [],
+        relatedItems: [],
         entityServices: {
             'CANDIDATE': candidateService,
             'ELECTION': electionService
@@ -16,20 +17,31 @@ export const itemsModule = {
         SET_ITEMS(state, items) {
             state.items = items;
         },
+        SET_RELATED_ITEMS(state, relatedItems) {
+            state.relatedItems = relatedItems;
+        }
     },
     getters: {
         items: (state) => state.items,
         entityServices: (state) => state.entityServices,
+        getElections: (state) => {
+            return state.relatedItems.map(election => ({
+                value: election.id,
+                label: election.election_name
+            }));
+        }
     },
     actions: {
-        loadItems({ commit }, paramEntity) {
+        loadItems({ commit }, paramObj) {
             
-            function handleSuccess(commit, success) {
-                commit('SET_ITEMS', success.data);
+            function handleSuccess(commit, paramFunctionToBeCalled, success) {
+                commit(paramFunctionToBeCalled, success.data);
             }
 
-            this.getters.entityServices[paramEntity.toUpperCase()].load()
-            .then((success) => handleSuccess(commit, success))
+            this.getters.entityServices[paramObj.entity.toUpperCase()].load()
+            .then((success) => {
+                handleSuccess(commit, paramObj.functionToBeCalled, success)
+            })
             .catch((error) => console.error(error));
 
         },
@@ -42,11 +54,9 @@ export const itemsModule = {
                 "UPDATE": (paramObject) => entityService.update(paramObject.data)
             };
 
-            console.log(paramObject.crudFunction);
-            
             return actions[paramObject.crudFunction](paramObject)
                 .then(response => {
-                    dispatch('loadItems', paramObject.entity);
+                    dispatch('loadItems', { functionToBeCalled: 'SET_ITEMS', entity: paramObject.entity });
                     return response;
                 })
                 .catch(error => {

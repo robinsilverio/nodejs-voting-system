@@ -12,9 +12,11 @@
                 <div class="back-button-wrapper">
                     <a @click="this.closeCRUDContainer()">Return to dashboard.</a>
                 </div>
-                <h1>{{ this.buttonStatus.title }}</h1>
+                <div>
+                    <h1>{{ this.buttonStatus.title }}</h1>
+                    <button class="button success" @click="this.openForm('CREATE', null)">Create {{ this.buttonStatus.entity }}</button>
+                </div>
             </div>
-            <button class="button success" @click="this.openForm('CREATE', null)">Create {{ this.buttonStatus.entity }}</button>
             <ul>
                 <li v-if="getItems.length == 0">No {{ this.buttonStatus.entity }} available.</li>
                 <li v-else v-for="item in getItems" :key="item.id">
@@ -72,7 +74,11 @@ export default {
                 entity: paramButton.name.singular,
             }
             this.itemName = `${paramButton.name.singular}_name`;
-            store.dispatch('loadItems', paramButton.name.singular);
+            const objToBeSend = {
+                functionToBeCalled: 'SET_ITEMS',
+                entity: paramButton.name.singular,
+            }
+            store.dispatch('loadItems', objToBeSend);
         },
         closeCRUDContainer() {
             this.buttonStatus = null;
@@ -87,6 +93,9 @@ export default {
         },
         closeForm(paramValue) {
             this.isFormOpen = false;
+        },
+        created() {
+            alert(this.getItems);
         }   
     }
 };
@@ -99,6 +108,10 @@ export default {
     .dashboard-container .CRUD-area ul li, 
     .dashboard-container .CRUD-area ul li .action-buttons {
         display: flex;
+    }
+
+    .dashboard-container h1 {
+        margin: 10px 0px;
     }
 
     header, .dashboard-container, .dashboard-buttons {
@@ -156,9 +169,16 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        gap: 15px;
+    }
+    .dashboard-container .CRUD-area .CRUD-area-header .back-button-wrapper, 
+    .dashboard-container .CRUD-area .CRUD-area-header div:last-of-type {
+        display: flex;
     }
     .dashboard-container .CRUD-area .CRUD-area-header .back-button-wrapper {
-        display: flex;
         justify-content: flex-end;
+    }
+    .dashboard-container .CRUD-area .CRUD-area-header  div:last-of-type {
+        justify-content: space-between;
     }
 </style>
