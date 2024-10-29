@@ -26,6 +26,7 @@
 <script>
 import { store } from '@/store';
 import { validateInputs } from '@/utils/validators/validators';
+import { formatDateToInputValue } from '../../../../utils/dateUtils';
 
     export default {
         name: 'CRUDFormComponent',
@@ -57,8 +58,8 @@ import { validateInputs } from '@/utils/validators/validators';
                             {name: 'election_name', type: 'text', label: 'Election name',  value: this.item ? this.item.election_name : ''},
                             {name: 'election_description', type: 'textarea', label: 'Election description',  value: this.item ? this.item.election_description : ''},
                             {name: 'election_type', type: 'dropDown', options: ['National', 'Regional', 'Internal'], label: 'Election type',  value: this.item ? this.item.election_type : ''},
-                            {name: 'election_startdate', type: 'date', label: 'Start date', value: this.item ? this.formatDateToInputValue(this.item.election_startdate) : undefined},
-                            {name: 'election_enddate', type: 'date', label: 'End date', value: this.item ? this.formatDateToInputValue(this.item.election_enddate) : undefined},
+                            {name: 'election_startdate', type: 'date', label: 'Start date', value: this.item ? formatDateToInputValue(this.item.election_startdate) : undefined},
+                            {name: 'election_enddate', type: 'date', label: 'End date', value: this.item ? formatDateToInputValue(this.item.election_enddate) : undefined},
                         ]
                     }
                 }
@@ -107,13 +108,6 @@ import { validateInputs } from '@/utils/validators/validators';
             },
             closeForm() {
                 this.$emit('closeForm', false);
-            },
-            formatDateToInputValue(date) {
-                const d = new Date(date);
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
             },
             clearErrorMessages() {
                 this.errorMessages = [];
