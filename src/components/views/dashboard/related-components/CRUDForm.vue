@@ -66,24 +66,11 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
             }
         },
         methods: {
-            determineEntity(paramData) {
-                return {
-                    'CANDIDATE': {
-                        id: this.item ? this.item.id : null, 
-                        candidate_name: paramData.candidate_name,  
-                        party_filiation: paramData.party_filiation,
-                        runs_for: paramData.runs_for,
-                        participates_in: this.item ? this.item.participates_in : null,
-                    },
-                    'ELECTION': {
-                        id: this.item ? this.item.id : null,
-                        election_name: paramData.election_name,
-                        election_description: paramData.election_description,
-                        election_type: paramData.election_type,
-                        election_startdate: paramData.election_startdate,
-                        election_enddate: paramData.election_enddate
-                    }
-                }
+            createEntityObject(paramForm) {
+                return paramForm.inputFields.filter(field => field.name !== 'id').reduce((acc, field) => {
+                    acc[field.name] = field.value;
+                    return acc;
+                }, {});
             },
             submitForm() {
 
@@ -97,12 +84,7 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
                     return;
                 }
 
-                const entityData = this.determineEntity(this.form[currentForm].inputFields.reduce((paramDataToBeCreated,  field) => {
-                    paramDataToBeCreated[field.name] = field.value;
-                    return paramDataToBeCreated;
-                }, {}))[this.entity.toUpperCase()];
-
-                store.dispatch('determineFormMutation', { entity: this.entity, data: entityData, crudFunction: this.crudFunction})
+                store.dispatch('determineFormMutation', { entity: this.entity, data: this.createEntityObject(this.form[currentForm]), crudFunction: this.crudFunction})
                 .then(() => this.$emit('closeForm', false))
                 .catch((error) => this.errorMessages.push(error.response.data));
             },

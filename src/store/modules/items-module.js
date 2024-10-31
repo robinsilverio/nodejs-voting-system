@@ -46,7 +46,7 @@ export const itemsModule = {
 
         },
         determineFormMutation({ commit, dispatch }, paramObject) {
-    
+
             const entityService = this.getters.entityServices[paramObject.entity.toUpperCase()];
 
             const actions = {
@@ -67,7 +67,7 @@ export const itemsModule = {
         deleteItem({ commit, dispatch }, paramObject) {
             const entityService = this.getters.entityServices[paramObject.entity.toUpperCase()];
             entityService.delete(paramObject.id)
-            .then(() => dispatch('loadItems', paramObject.entity))
+            .then(() => dispatch('loadItems', { functionToBeCalled: 'SET_ITEMS', entity: paramObject.entity }))
             .catch(error => console.error('Action failed:', error));
         }
     }
