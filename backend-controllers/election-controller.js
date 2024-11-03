@@ -1,8 +1,9 @@
-import { getRequestBody, sendResponse } from "../server-routes.js";
+import { getRequestBody, isValidId, sendResponse } from "../server-routes.js";
 import { 
     performCreateElection, 
     performDeleteElection, 
     performRetrieveElections, 
+    performRetrieveElectionsByParticipatingCandidate, 
     performUpdateElection
 } from "../backend-services/election-service.js";
 import { statusCodes } from "../src/enums/status-codes.js";
@@ -15,6 +16,21 @@ export async function retrieveElections(paramRes) {
     } catch (error) {
         console.error(error);
         return sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong in the server during retrieving elections.');
+    }
+}
+
+export async function retrieveElectionsByParticipatingCandidate(paramReq, paramRes) {
+
+    if (!isValidId(paramReq.params)) {
+        return sendResponse(paramRes, statusCodes.BAD_REQUEST, 'ID parameter is required or invalid.');
+    }
+
+    try {
+        const result = await performRetrieveElectionsByParticipatingCandidate(paramReq.params.id);
+        return sendResponse(paramRes, statusCodes.SUCCESS, result.rows);
+    } catch (error) {
+        console.error(error);
+        return sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, 'Something went wrong in the server during retrieving elections by candidate.');
     }
 }
 
@@ -49,17 +65,12 @@ export async function updateElection(paramReq, paramRes) {
 }
 
 export async function deleteElection(paramReq, paramRes) {
-    // Check if the query is set
-    if (!paramReq.query || !paramReq.query.id) {
-        return sendResponse(paramRes, statusCodes.BAD_REQUEST, { error: 'ID parameter is required.' });
+
+    if (!isValidId(paramReq.query)) {
+        return sendResponse(paramRes, statusCodes.BAD_REQUEST, { error: 'ID parameter is required or invalid.' });
     }
 
-    const id = paramReq.query.id;
-
-    // Validate the ID (for example, check if it's a valid number)
-    if (isNaN(id) || id <= 0) {
-        return sendResponse(paramRes, statusCodes.BAD_REQUEST, { error: 'Invalid ID parameter.' });
-    }
+    const id = paramReq.query.id;   
 
     try {
         const response = await performDeleteElection(id);

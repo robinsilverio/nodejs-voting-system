@@ -1,4 +1,4 @@
-import { getRequestBody, sendResponse } from "../server-routes.js";
+import { getRequestBody, isValidId, sendResponse } from "../server-routes.js";
 import { performCreateCandidate, performDeleteCandidate, performRetrieveCandidates, performUpdateCandidate } from "../backend-services/candidate-service.js";
 import { statusCodes } from "../src/enums/status-codes.js";
 import { existsInDatabase } from "../dbclient.js";
@@ -42,17 +42,12 @@ export async function updateCandidate(paramReq, paramRes) {
 }
 
 export async function deleteCandidate(paramReq, paramRes) {
-    // Check if the query is set
-    if (!paramReq.query || !paramReq.query.id) {
-        return sendResponse(paramRes, statusCodes.BAD_REQUEST, { error: 'ID parameter is required.' });
+    
+    if (!isValidId(paramReq.query)) {
+        return sendResponse(paramRes, statusCodes.BAD_REQUEST, { error: 'ID parameter is required or invalid.' });
     }
 
     const id = paramReq.query.id;
-
-    // Validate the ID (for example, check if it's a valid number)
-    if (isNaN(id) || id <= 0) {
-        return sendResponse(paramRes, statusCodes.BAD_REQUEST, { error: 'Invalid ID parameter.' });
-    }
 
     try {
         const response = await performDeleteCandidate(id);

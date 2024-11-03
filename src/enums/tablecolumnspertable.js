@@ -28,4 +28,9 @@ export const tableColumnsPerTable = {
         'runs_for',
         'participates_in',
     ],
+    'PARTICIPATING_CANDIDATES': [
+        'id',
+        'candidate_id',
+        'election_id',
+    ]
 }

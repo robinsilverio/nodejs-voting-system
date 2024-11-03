@@ -1,5 +1,5 @@
 import { statusCodes } from "../src/enums/status-codes.js";
-import { deleteFromTable, existsInDatabase, insertIntoTable, retrieveFromTable, updateFromTable } from "../dbclient.js";
+import { deleteFromTable, existsInDatabase, insertIntoTable, retrieveFromTable, retrieveFromTableUsingJoin, updateFromTable } from "../dbclient.js";
 import { getRequestBody, sendResponse } from "../server-routes.js";
 
 export class HandleDatabaseService {
@@ -9,13 +9,15 @@ export class HandleDatabaseService {
     }
 
     async retrieve(paramConditions = {}) {
-        const result = await retrieveFromTable(this.entity, paramConditions);
-        return result;
+        return await retrieveFromTable(this.entity, paramConditions);
+    }
+
+    async retrieveByJoin(paramJoinInformation) {
+        return await retrieveFromTableUsingJoin(this.entity, paramJoinInformation);
     }
 
     async create(paramRequestBody) {
-        const result = await insertIntoTable(`${this.entity}`, paramRequestBody);
-        return result;
+        return await insertIntoTable(`${this.entity}`, paramRequestBody);
     }
 
     async update(paramRequestBody) {

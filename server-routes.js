@@ -5,6 +5,7 @@ import {
     createElection, 
     deleteElection, 
     retrieveElections, 
+    retrieveElectionsByParticipatingCandidate, 
     updateElection 
 } from './backend-controllers/election-controller.js';
 import { 
@@ -27,6 +28,7 @@ router.get('/validate-jwt', (req, res) => {
 router.get('/validate-voter-token', (req, res) => validateVoterToken(req, res));
 router.post('/elections', authorizeJwt, (req, res) =>  createElection(req, res));
 router.get('/elections', authorizeJwt, (req, res) => retrieveElections(res));
+router.get('/elections/candidate/:id', (req, res) => retrieveElectionsByParticipatingCandidate(req, res));
 router.put('/elections', authorizeJwt, (req, res) => updateElection(req, res));
 router.delete('/elections', authorizeJwt, (req, res) => deleteElection(req, res));
 router.post('/candidates', authorizeJwt, (req, res) => createCandidate(req, res));
@@ -45,6 +47,15 @@ export const getRequestBody = (paramReq) => {
         paramReq.on('error', err => reject(err));
     });
 };
+
+export const isValidId = (paramReqQuery) => {
+    if (!paramReqQuery || !paramReqQuery.id) {
+        return false;
+    }
+
+    const id = paramReqQuery.id;
+    return !isNaN(id) && id > 0;
+}
 
 // Method for generating responses.
 export const sendResponse = (paramRes, paramStatusCode, paramResponseMessage) => {

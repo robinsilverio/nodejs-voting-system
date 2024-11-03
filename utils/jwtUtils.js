@@ -5,8 +5,9 @@ export const validateJwtToken = (paramAuthHeader) => {
 
     let response;
 
-    if (!paramAuthHeader) {
+    if (!paramAuthHeader || paramAuthHeader == undefined) {
         response = { statusCode: statusCodes.FORBIDDEN, data: 'No token provided' };
+        return response;
     }
 
     const token = paramAuthHeader.split(' ')[1];
@@ -18,9 +19,8 @@ export const validateJwtToken = (paramAuthHeader) => {
             return response;
         }
 
-        response = { statusCode: statusCodes.SUCCESS, data: { role: decoded.role } }
+        response = { statusCode: statusCodes.SUCCESS, data: { role: decoded.role } };
     });
-
     return response;
 }
 
