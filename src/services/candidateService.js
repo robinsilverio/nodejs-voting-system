@@ -11,6 +11,7 @@ export class CandidateService {
         return axios.post(this.candidatesApiUrl, paramData, { headers: { 'authorization': `Bearer ${sessionStorage.getItem('authToken')}`}});
     }
     update(paramData) {
+        console.log(paramData);
         return axios.put(this.candidatesApiUrl, paramData, { headers: { 'authorization': `Bearer ${sessionStorage.getItem('authToken')}`}});
     }
     delete(paramId) {

@@ -29,7 +29,7 @@ export const validateInputs = (paramForms) => {
             const fieldValidator = formValidator.fields[inputField.name];
 
             if (fieldValidator) {
-                const errorMessage = fieldValidator(inputField.value, startDateValue);
+                const errorMessage = fieldValidator(inputField, startDateValue);
                 if (errorMessage) {
                     errors.push(errorMessage); 
                 }

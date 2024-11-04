@@ -2,6 +2,8 @@ import { getRequestBody, isValidId, sendResponse } from "../server-routes.js";
 import { performCreateCandidate, performDeleteCandidate, performRetrieveCandidates, performUpdateCandidate } from "../backend-services/candidate-service.js";
 import { statusCodes } from "../src/enums/status-codes.js";
 import { existsInDatabase } from "../dbclient.js";
+import { performRetrieveElections } from "../backend-services/election-service.js";
+import { performInsertParticipatingCandidate } from "../backend-services/participating-candidate-service.js";
 
 export async function retrieveCandidates(paramRes) {
     try {
@@ -15,15 +17,36 @@ export async function retrieveCandidates(paramRes) {
 
 export async function createCandidate(paramReq, paramRes) {
     try {
+        
         const requestBody = await getRequestBody(paramReq);
         const nameField = `candidate_name`;
+        const participates_in = requestBody.participates_in;
+        const registeredElections = await performRetrieveElections();
+        const electionExists = participates_in.every(electionName => registeredElections.rows.some(election => election.election_name === electionName));
 
         if (await existsInDatabase('candidate', { [nameField] : requestBody[nameField] })) {
             return sendResponse(paramRes, statusCodes.BAD_REQUEST, `Candidate already exists.`);
         }
 
-        const response = await performCreateCandidate(requestBody);
+        if (!electionExists) {
+            return sendResponse(paramRes, statusCodes.BAD_REQUEST, `One or more elections in ${participates_in} do not exist.`);
+        } else {
+            const candidate = Object.keys(requestBody).reduce((obj, key) => {
+                if (key !== 'id' && key !== 'participates_in') {
+                    obj[key] = requestBody[key];
+                }
+                return obj;
+            }, {});
+            const result = await performCreateCandidate(candidate);
+            const candidateId = result.rows[0].id;
+            for (const electionName of participates_in) {
+                const electionId = registeredElections.rows.find(election => election.election_name === electionName).id;
+                await performInsertParticipatingCandidate(candidateId, electionId);
+            }
+        }
+
         return sendResponse(paramRes, statusCodes.SUCCESS, 'Candidate created.' );
+    
     } catch (error) {
         console.error(error);
         return sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, 'Internal Server Error during creating candidate');

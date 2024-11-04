@@ -67,17 +67,17 @@ const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditio
     const columns = paramColumns.map(column => {
         // Check if the column is from the main or join table
         if (column.includes('.')) {
-            return `${column}`; // Use as-is if already formatted as "table.column"
+            return `${column}`;
         }
         return `${paramJoin && paramJoin.tableColumns?.includes(column) ? joinTableAlias : mainTableAlias}.${column}`;
     }).join(', ');
 
     const whereClause = Object.keys(paramConditions).length > 0
-        ? `WHERE ${Object.keys(paramConditions).map((key, index) => `${key} = $${index + 1}`).join(' AND ')}` 
+        ? `WHERE ${Object.keys(paramConditions).map((key, index) => `${key} = $${index + 1}`).join(' AND ')}`
         : '';
 
     const joinClause = paramJoin && Object.keys(paramJoin).length > 0
-        ? `JOIN ${paramJoin.joinTable} ${joinTableAlias} ON ${mainTableAlias}.${paramJoin.on} = ${joinTableAlias}.${paramJoin.referenceColumn}`
+        ? `JOIN ${paramJoin.joinTable} ${joinTableAlias} ON ${paramTableName}.${paramJoin.on} = ${paramJoin.joinTable}.${paramJoin.referenceColumn}`
         : '';
 
     switch (paramQueryType) {
@@ -89,7 +89,7 @@ const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditio
         case 'INSERT':
             const insertValues = paramValues.map((value, index) => `$${index + 1}`).join(', ');
             return {
-                text: `INSERT INTO ${paramTableName} (${columns}) VALUES (${insertValues}) RETURNING id`,
+                text: `INSERT INTO ${paramTableName} (${paramColumns.join(', ')}) VALUES (${insertValues}) RETURNING id`,
                 values: paramValues
             };
         case 'UPDATE':

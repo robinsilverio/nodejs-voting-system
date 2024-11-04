@@ -26,7 +26,6 @@ export const tableColumnsPerTable = {
         'candidate_name',
         'party_filiation',
         'runs_for',
-        'participates_in',
     ],
     'PARTICIPATING_CANDIDATES': [
         'id',

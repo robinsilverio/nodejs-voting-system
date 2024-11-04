@@ -6,6 +6,10 @@ export const performRetrieveElections = async() => {
     return await handleDatabaseService.retrieve();
 }
 
+export const retrieveElectionByElectionName =  async(paramElectionName) => {
+    return await handleDatabaseService.retrieve({ election_name: paramElectionName });
+}
+
 export const performRetrieveElectionsByParticipatingCandidate = async(paramId) => {
     const joinInformation = {
         selectedColumns: ['id', 'election_name'],
