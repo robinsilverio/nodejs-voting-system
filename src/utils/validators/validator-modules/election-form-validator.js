@@ -9,44 +9,44 @@ export const electionForm = {
         isDateAfterCurrentDate: (inputDate, currentDate) => inputDate >= currentDate
     },
     fields: {
-        "election_name" : (paramValue, customValue) => {
+        "election_name" : (paramInputField, customValueForComparison) => {
             
-            if (electionForm.validationMethods.isInputEmpty(paramValue)) {
+            if (electionForm.validationMethods.isInputEmpty(paramInputField.value)) {
                 return 'Het is vereist om verkiezingsnaam in te voeren.';
             }
-            if (!electionForm.validationMethods.isElectionNameValid(paramValue)) {
+            if (!electionForm.validationMethods.isElectionNameValid(paramInputField.value)) {
                 return 'Dit is een ongeldige verkiezingsnaam.';
             }
             return;
         },
-        "election_description" : (paramValue, customValue) => {
+        "election_description" : (paramInputField, customValueForComparison) => {
 
-            if (electionForm.validationMethods.isInputEmpty(paramValue)) {
+            if (electionForm.validationMethods.isInputEmpty(paramInputField.value)) {
                 return 'Het is vereist om een beschrijving van de verkiezing in te voeren.';
             }
-            if (!electionForm.validationMethods.isElectionDescriptionValid(paramValue)) {
+            if (!electionForm.validationMethods.isElectionDescriptionValid(paramInputField.value)) {
                 return 'De beschrijving van de verkiezing mag niet langer zijn dan 500';
             }
 
             return;
         },
-        "election_type" : (paramValue, customValue) => {
+        "election_type" : (paramInputField, customValueForComparison) => {
 
-            if (electionForm.validationMethods.isInputEmpty(paramValue)) {
+            if (electionForm.validationMethods.isInputEmpty(paramInputField.value)) {
                 return 'Het is vereist om een verkiezings type te selecteren.';
             }
-            if (!electionForm.validationMethods.isValidOption(paramValue)) {
+            if (!electionForm.validationMethods.isValidOption(paramInputField.value)) {
                 return 'Selecteer een geldige verkiezings type.';
             }
             return;
         },
-        "election_startdate" : (paramValue, customValue) => {
+        "election_startdate" : (paramInputField, customValueForComparison) => {
 
-            if (electionForm.validationMethods.isInputEmpty(paramValue)) {
+            if (electionForm.validationMethods.isInputEmpty(paramInputField.value)) {
                 return 'Het is vereist om een startdatum van de verkiezing in te voeren.';
             }
 
-            const inputDate = new Date(paramValue);
+            const inputDate = new Date(paramInputField.value);
             const currentDate = new Date();
 
             if (!electionForm.validationMethods.isDateAfterCurrentDate(inputDate, currentDate)) {
@@ -54,11 +54,11 @@ export const electionForm = {
             }
             return;
         },
-        "election_enddate" : (paramValue, customValueForComparison) => {
-            if (electionForm.validationMethods.isInputEmpty(paramValue)) {
+        "election_enddate" : (paramInputField, customValueForComparison) => {
+            if (electionForm.validationMethods.isInputEmpty(paramInputField.value)) {
                 return 'Het is vereist om een einddatum van de verkiezing in te voeren.';
             }
-            if (!electionForm.validationMethods.isDateAfterCurrentDate(new Date(paramValue), new Date(customValueForComparison))) {
+            if (!electionForm.validationMethods.isDateAfterCurrentDate(new Date(paramInputField.value), new Date(customValueForComparison))) {
                 return  'De einddatum van de verkiezing mag niet eerder zijn dan de startdatum.';
             }
             return;
