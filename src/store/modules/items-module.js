@@ -1,32 +1,48 @@
 import { CandidateService } from "@/services/candidateService";
 import { ElectionService } from "@/services/election-service";
+import { ParticipatingCandidateService } from "@/services/participating-candidate-service";
 
 const electionService = new ElectionService();
 const candidateService = new CandidateService();
+const participatingCandidateService = new ParticipatingCandidateService();
 
 export const itemsModule = {
     state: () => ({
         items: [],
-        relatedItems: [],
+        elections: [],
+        electionsPerParticipatingCandidate: [],
         entityServices: {
             'CANDIDATE': candidateService,
-            'ELECTION': electionService
+            'ELECTION': electionService,
+            'PARTICIPATING_ELECTIONS_PER_CANDIDATE': participatingCandidateService
         }
     }),
     mutations: {
         SET_ITEMS(state, items) {
             state.items = items;
         },
-        SET_RELATED_ITEMS(state, relatedItems) {
-            state.relatedItems = relatedItems;
+        SET_ELECTIONS(state, paramElections) {
+            state.elections = paramElections;
+        },
+        SET_ELECTIONS_PER_PARTICIPATING_CANDIDATE(state, paramElections) {
+            state.electionsPerParticipatingCandidate = paramElections;
         }
     },
     getters: {
         items: (state) => state.items,
         entityServices: (state) => state.entityServices,
+        getParticipatingCandidateService: (state) => {
+            return state.entityServices['PARTICIPATING_ELECTIONS_PER_CANDIDATE'];
+        },
         getElections: (state) => {
-            return state.relatedItems.map(election => ({
-                value: election.id,
+            return state.elections.map(election => ({
+                id: election.id,
+                label: election.election_name
+            }));
+        },
+        getElectionsPerParticipatingCandidate: (state) => {
+            return state.electionsPerParticipatingCandidate.map(election => ({
+                id: election.id,
                 label: election.election_name
             }));
         }
@@ -44,6 +60,13 @@ export const itemsModule = {
             })
             .catch((error) => console.error(error));
 
+        },
+        loadParticipatingElectionsPerCandidate({ commit }, paramObj) {
+            this.getters.getParticipatingCandidateService.load(paramObj.candidate.id)
+            .then((success) => {
+                commit('SET_ELECTIONS_PER_PARTICIPATING_CANDIDATE', success.data);
+            })
+            .catch((error) => console.error(error));
         },
         determineFormMutation({ commit, dispatch }, paramObject) {
 

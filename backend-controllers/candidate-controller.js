@@ -22,7 +22,7 @@ export async function createCandidate(paramReq, paramRes) {
         const nameField = `candidate_name`;
         const participates_in = requestBody.participates_in;
         const registeredElections = await performRetrieveElections();
-        const electionExists = participates_in.every(electionName => registeredElections.rows.some(election => election.election_name === electionName));
+        const electionExists = participates_in.every(toParticipateElection => registeredElections.rows.some(election => election.election_name === toParticipateElection.label));
 
         if (await existsInDatabase('candidate', { [nameField] : requestBody[nameField] })) {
             return sendResponse(paramRes, statusCodes.BAD_REQUEST, `Candidate already exists.`);
@@ -40,7 +40,7 @@ export async function createCandidate(paramReq, paramRes) {
             const result = await performCreateCandidate(candidate);
             const candidateId = result.rows[0].id;
             for (const electionName of participates_in) {
-                const electionId = registeredElections.rows.find(election => election.election_name === electionName).id;
+                const electionId = registeredElections.rows.find(election => election.election_name === electionName.label).id;
                 await performInsertParticipatingCandidate(candidateId, electionId);
             }
         }

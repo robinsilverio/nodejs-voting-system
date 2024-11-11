@@ -77,7 +77,7 @@ const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditio
         : '';
 
     const joinClause = paramJoin && Object.keys(paramJoin).length > 0
-        ? `JOIN ${paramJoin.joinTable} ${joinTableAlias} ON ${paramTableName}.${paramJoin.on} = ${paramJoin.joinTable}.${paramJoin.referenceColumn}`
+        ? `JOIN ${paramJoin.joinTable} ${joinTableAlias} ON ${mainTableAlias}.${paramJoin.on} = ${joinTableAlias}.${paramJoin.referenceColumn}`
         : '';
 
     switch (paramQueryType) {

@@ -18,14 +18,14 @@
                     <p v-if="field.list.length < 1">Please select an election that a candidate has to participate.</p>
                     <ul>
                         <li v-for="(item, index) in field.list" :key="index">
-                            <p>{{ item }}</p>
+                            <p>{{ item.label }}</p>
                             <button class="button delete" @click.prevent="field.deleteItem(field.list, item)" >Delete</button>
                         </li>
                     </ul>
                     <div class="input-row">
                         <select :name="field.name" v-model="field.value" v-on:focus="this.clearErrorMessages()">
                             <option value="">Select an election</option>
-                            <option v-for="(item, index) in this.getElectionsToBeSelected" :key="index" :value="item.label">{{ item.label }}</option>
+                            <option v-for="(item, index) in this.getElections" :key="index" :value="item.label">{{ item.label }}</option>
                         </select>
                         <button class="button success" @click.prevent="field.addItem(field.list, field.value)">Voeg verkiezing toe aan kandidaat</button>
                     </div>
@@ -77,7 +77,8 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
                                         this.errorMessages.push('Please select a valid election');
                                         return;
                                     }
-                                    paramList.push(paramValue); 
+                                    let toParticipateElection = { label: paramValue, }
+                                    paramList.push(toParticipateElection); 
                                 }, 
                                 deleteItem: (paramList, paramValue) => { paramList.splice(paramList.indexOf(paramValue), 1) }, 
                                 value: ''
@@ -145,16 +146,23 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
             onFormInvalid() {
                 return this.errorMessages;
             },
-            getElectionsToBeSelected() {
+            getElections() {
                 return store.getters.getElections;
+            },
+            getElectionsPerParticipatingCandidate() {
+                return store.getters.getElectionsPerParticipatingCandidate;
+            },
+            isFormInUpdateMode() {
+                return this.entity === 'candidate' && this.crudFunction == 'UPDATE';
             }
         },
         created() {
-            if (this.entity === 'candidate') {
-                store.dispatch('loadItems', { functionToBeCalled: 'SET_RELATED_ITEMS', entity: 'election' });
+            store.dispatch('loadItems', { functionToBeCalled: 'SET_ELECTIONS', entity: 'election' });
+            if (this.isFormInUpdateMode) {
+                store.dispatch('loadParticipatingElectionsPerCandidate', { candidate: this.item });
                 setTimeout(() => {
-                    this.form.candidateForm.inputFields[3].options = this.getElectionsToBeSelected.map(election => election.label);
-                }, 500);
+                    this.form.candidateForm.inputFields[3].list = this.getElectionsPerParticipatingCandidate;
+                }, 500)
             }
         }
     }
