@@ -22,27 +22,22 @@ export async function createCandidate(paramReq, paramRes) {
         const nameField = `candidate_name`;
         const participates_in = requestBody.participates_in;
         const registeredElections = await performRetrieveElections();
-        const electionExists = participates_in.every(toParticipateElection => registeredElections.rows.some(election => election.election_name === toParticipateElection.label));
 
         if (await existsInDatabase('candidate', { [nameField] : requestBody[nameField] })) {
             return sendResponse(paramRes, statusCodes.BAD_REQUEST, `Candidate already exists.`);
         }
 
-        if (!electionExists) {
-            return sendResponse(paramRes, statusCodes.BAD_REQUEST, `One or more elections in ${participates_in} do not exist.`);
-        } else {
-            const candidate = Object.keys(requestBody).reduce((obj, key) => {
-                if (key !== 'id' && key !== 'participates_in') {
-                    obj[key] = requestBody[key];
-                }
-                return obj;
-            }, {});
-            const result = await performCreateCandidate(candidate);
-            const candidateId = result.rows[0].id;
-            for (const electionName of participates_in) {
-                const electionId = registeredElections.rows.find(election => election.election_name === electionName.label).id;
-                await performInsertParticipatingCandidate(candidateId, electionId);
+        const candidate = Object.keys(requestBody).reduce((obj, key) => {
+            if (key !== 'id' && key !== 'participates_in') {
+                obj[key] = requestBody[key];
             }
+            return obj;
+        }, {});
+        const result = await performCreateCandidate(candidate);
+        const candidateId = result.rows[0].id;
+        for (const electionName of participates_in) {
+            const electionId = registeredElections.rows.find(election => election.election_name === electionName.label).id;
+            await performInsertParticipatingCandidate(candidateId, electionId);
         }
 
         return sendResponse(paramRes, statusCodes.SUCCESS, 'Candidate created.' );
