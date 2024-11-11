@@ -99,7 +99,7 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
         },
         methods: {
             createEntityObject(paramForm, paramId) {
-                const entityObject = paramForm.inputFields.reduce((acc, field) => {
+                let entityObject = paramForm.inputFields.reduce((acc, field) => {
                     if (field.type === 'formGroup') {
                         acc[field.name] = field.list;
                     } else {
@@ -108,7 +108,7 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
                     return acc;
                 }, {});
                 if (paramId) {
-                    entityObject.id = paramId;
+                    entityObject = { id: paramId, ...entityObject };
                 }
                 return entityObject;
             },

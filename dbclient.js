@@ -50,7 +50,7 @@ const insert = (paramTableName, paramColumns, paramValues) => {
     return executeQuery('INSERT',  paramTableName, paramColumns, {}, paramValues);
 };
 const update = (paramTableName, paramColumns, paramConditions, paramValues) => {
-    return  executeQuery('UPDATE', paramTableName, paramColumns, paramConditions, Object.values(filterId(paramValues)));
+    return  executeQuery('UPDATE', paramTableName, paramColumns, paramConditions, Object.values(paramValues));
 }
 const remove = (paramTableName,  paramConditions) => {
     return executeQuery('DELETE', paramTableName, [], paramConditions);
@@ -127,7 +127,7 @@ export const insertIntoTable = async (paramTableName, paramData) => {
     return await insert(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()].filter(column => column !== 'id'), Object.values(filterId(paramData)));
 }
 export const updateFromTable = async (paramTableName, paramData) => {
-    await update(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()].filter(column => column !== 'id'), { id: paramData.id }, paramData);
+    await update(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()], { id: paramData.id }, paramData);
 }
 export const  deleteFromTable = async (paramTableName, paramId) => {
     await remove(paramTableName, { id: paramId });

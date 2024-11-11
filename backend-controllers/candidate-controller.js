@@ -4,6 +4,7 @@ import { statusCodes } from "../src/enums/status-codes.js";
 import { existsInDatabase } from "../dbclient.js";
 import { performRetrieveElections } from "../backend-services/election-service.js";
 import { performInsertParticipatingCandidate } from "../backend-services/participating-candidate-service.js";
+import { filteredObjectByConditionSet } from "../src/utils/objectUtils.js";
 
 export async function retrieveCandidates(paramRes) {
     try {
@@ -27,12 +28,7 @@ export async function createCandidate(paramReq, paramRes) {
             return sendResponse(paramRes, statusCodes.BAD_REQUEST, `Candidate already exists.`);
         }
 
-        const candidate = Object.keys(requestBody).reduce((obj, key) => {
-            if (key !== 'id' && key !== 'participates_in') {
-                obj[key] = requestBody[key];
-            }
-            return obj;
-        }, {});
+        const candidate = filteredObjectByConditionSet(requestBody, (key) => key !== 'id' && key !== 'participates_in');
         const result = await performCreateCandidate(candidate);
         const candidateId = result.rows[0].id;
         for (const electionName of participates_in) {
@@ -51,8 +47,11 @@ export async function createCandidate(paramReq, paramRes) {
 export async function updateCandidate(paramReq, paramRes) {
     try {
         let requestBody = await getRequestBody(paramReq);
-        const response = await performUpdateCandidate(requestBody);
-        return sendResponse(paramRes, response.statusCode, response.data);
+        const response = await performUpdateCandidate(filteredObjectByConditionSet(requestBody, (key) => key !== 'participates_in'));
+
+        // Work in progress... for adding and removing elections that a candidate is participating.
+        
+        return sendResponse(paramRes, statusCodes.SUCCESS, response.data);
     } catch (error) {
         console.error(error);
         return sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, 'Internal Server Error during updating candidate');
