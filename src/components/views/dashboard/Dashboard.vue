@@ -7,50 +7,19 @@
                 {{ button.value }}
             </div>
         </div>
-        <div class="CRUD-area" v-if="this.buttonStatus !== null">
-            <div class="CRUD-area-header">
-                <div class="back-button-wrapper">
-                    <a @click="this.closeCRUDContainer()">Return to dashboard.</a>
-                </div>
-                <div>
-                    <h1>{{ this.buttonStatus.title }}</h1>
-                    <button class="button success" @click="this.openForm('CREATE', null)">Create {{ this.buttonStatus.entity }}</button>
-                </div>
-            </div>
-            <ul>
-                <li v-if="getItems.length == 0">No {{ this.buttonStatus.entity }} available.</li>
-                <li v-else v-for="item in getItems" :key="item.id">
-                    <p>{{ item[this.itemName] }}</p>
-                    <div class="action-buttons">
-                        <button type="button" class="button modify" @click="this.openForm('UPDATE', item)">
-                            modify
-                        </button>
-                        <button type="button" class="button delete" @click="this.deleteItem(item.id, this.buttonStatus.entity)">
-                            remove
-                        </button>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        <CRUDFormComponent v-if="this.isFormOpen" :entity="this.buttonStatus.entity" :crudFunction="this.crudFunction" :item="this.item" @closeForm="closeForm" ></CRUDFormComponent>
+        <CRUDArea v-if="this.buttonStatus !== null" :buttonStatus="this.buttonStatus" @onCloseCrudContainer="onCloseCrudContainer"></CRUDArea>
     </div>
 </template>
 <script>
 
-import { store } from '@/store';
 import HeaderComponent from '../../header/Header.vue';
-import CRUDFormComponent from './related-components/CRUDForm.vue';
+import CRUDArea from './related-components/CRUDArea.vue';
 
 export default {
     name: 'DashboardComponent',
     components: {
         HeaderComponent,
-        CRUDFormComponent
-    },
-    computed: {
-        getItems() {
-            return store.getters.items;
-        }
+        CRUDArea
     },
     data() {
         return {
@@ -61,10 +30,7 @@ export default {
                 { id: 3, name: 'manage-ballots', value: 'Manage ballots', iconSrc: require('../../../assets/icons/Transparent_Manage_ballots.png') },
                 { id: 4, name: 'view-results', value: 'View results per election', iconSrc: require('../../../assets/icons/Transparent_View_results_per_election.png') }
             ],
-            buttonStatus: null,
-            isFormOpen: false,
-            crudFunction: null,
-            item: null
+            buttonStatus: null
         }
     },
     methods: {
@@ -72,27 +38,11 @@ export default {
             this.buttonStatus = {
                 title: paramButton.value,
                 entity: paramButton.name.singular,
+                itemName: `${paramButton.name.singular}_name`
             }
-            this.itemName = `${paramButton.name.singular}_name`;
-            const objToBeSend = {
-                functionToBeCalled: 'SET_ITEMS',
-                entity: paramButton.name.singular,
-            }
-            store.dispatch('loadItems', objToBeSend);
         },
-        closeCRUDContainer() {
+        onCloseCrudContainer() {
             this.buttonStatus = null;
-        },
-        deleteItem(paramId, paramEntity) {
-            store.dispatch('deleteItem', { id: paramId, entity: paramEntity } );
-        },
-        openForm(paramFunction, paramObj) {
-            this.item = paramObj;
-            this.crudFunction = paramFunction
-            this.isFormOpen = true;
-        },
-        closeForm(paramValue) {
-            this.isFormOpen = false;
         },
         created() {
             alert(this.getItems);
