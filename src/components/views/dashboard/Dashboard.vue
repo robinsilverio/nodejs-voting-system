@@ -37,15 +37,12 @@ export default {
         openCRUDContainer(paramButton) {
             this.buttonStatus = {
                 title: paramButton.value,
-                entity: paramButton.name.singular,
+                entity: paramButton.name.singular.toUpperCase(),
                 itemName: `${paramButton.name.singular}_name`
             }
         },
         onCloseCrudContainer() {
             this.buttonStatus = null;
-        },
-        created() {
-            alert(this.getItems);
         }   
     }
 };

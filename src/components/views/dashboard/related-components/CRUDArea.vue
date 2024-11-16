@@ -6,7 +6,7 @@
             </div>
             <div>
                 <h1>{{ this.buttonStatus.title }}</h1>
-                <button class="button success" @click="this.openForm('CREATE', null)">Create {{ this.buttonStatus.entity }}</button>
+                <button class="button success" @click="this.openForm('CREATE', null)">Create {{ this.buttonStatus.entity.toLowerCase() }}</button>
             </div>
         </div>
         <ul>
@@ -17,7 +17,7 @@
                     <button type="button" class="button modify" @click="this.openForm('UPDATE', item)">
                         modify
                     </button>
-                    <button type="button" class="button delete" @click="this.deleteItem(item.id, this.buttonStatus.entity)">
+                    <button type="button" class="button delete" @click="this.deleteItem(item.id)">
                         remove
                     </button>
                 </div>
@@ -38,7 +38,19 @@ import CRUDFormComponent from './CRUDForm.vue';
             return {
                 isFormOpen: false,
                 crudFunction: null,
-                item: null
+                item: null,
+                handleLoadItemsByEntity: {
+                    'ELECTION' : () => store.dispatch('loadElections'),
+                    'CANDIDATE' : () => store.dispatch('loadCandidates'),
+                },
+                handleItemsRetrievalByEntityAfterLoading: {
+                    'ELECTION' : () => store.getters.getElections,
+                    'CANDIDATE' : () => store.getters.getCandidates,
+                },
+                handleItemsDeletionByEntity: {
+                    'ELECTION': (paramId) => store.dispatch('deleteElection', { id: paramId }),
+                    'CANDIDATE': (paramId) => store.dispatch('deleteCandidate', { id: paramId }),
+                }
             }
         },
         props: {
@@ -46,12 +58,12 @@ import CRUDFormComponent from './CRUDForm.vue';
         },
         computed: {
             getItems() {
-                return store.getters.items;
+                return this.handleItemsRetrievalByEntityAfterLoading[this.buttonStatus.entity]();
             }
         },
         methods: {
-            deleteItem(paramId, paramEntity) {
-                store.dispatch('deleteItem', { id: paramId, entity: paramEntity } );
+            deleteItem(paramId) {
+                this.handleItemsDeletionByEntity[this.buttonStatus.entity](paramId);
             },
             openForm(paramFunction, paramObj) {
                 this.item = paramObj;
@@ -66,11 +78,7 @@ import CRUDFormComponent from './CRUDForm.vue';
             }
         },
         created() {
-            const objToBeSend = {
-                functionToBeCalled: 'SET_ITEMS',
-                entity: this.buttonStatus.entity,
-            }
-            store.dispatch('loadItems', objToBeSend);            
+            this.handleLoadItemsByEntity[this.buttonStatus.entity]();
         }
     }
 </script>

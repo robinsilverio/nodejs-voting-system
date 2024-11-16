@@ -25,7 +25,7 @@
                     <div class="input-row">
                         <select :name="field.name" v-model="field.value" v-on:focus="this.clearErrorMessages()">
                             <option value="">Select an election</option>
-                            <option v-for="(item, index) in this.getElections" :key="index" :value="item.label">{{ item.label }}</option>
+                            <option v-for="(item, index) in this.getElectionOptions" :key="index" :value="item.label">{{ item.label }}</option>
                         </select>
                         <button class="button success" @click.prevent="field.addItem(field.list, field.value)">Voeg verkiezing toe aan kandidaat</button>
                     </div>
@@ -40,9 +40,9 @@
     </div>
 </template>
 <script>
-import { store } from '@/store';
-import { validateInputs } from '@/utils/validators/validators';
-import { formatDateToInputValue } from '../../../../utils/dateUtils';
+    import { store } from '@/store';
+    import { validateInputs } from '@/utils/validators/validators';
+    import { formatDateToInputValue } from '../../../../utils/dateUtils';
 
     export default {
         name: 'CRUDFormComponent',
@@ -94,7 +94,11 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
                             {name: 'election_enddate', type: 'date', label: 'End date', value: this.item ? formatDateToInputValue(this.item.election_enddate) : undefined},
                         ]
                     }
-                }
+                },
+                handleFormSubmission: {
+                    'ELECTION': (paramData, paramCrudFunction) => store.dispatch('determineElectionMutation', { data: paramData, crudFunction: paramCrudFunction }),
+                    'CANDIDATE': (paramData, paramCrudFunction) => store.dispatch('determineCandidateMutation', { data: paramData, crudFunction: paramCrudFunction } ),
+                },
             }
         },
         methods: {
@@ -116,17 +120,16 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
 
                 this.clearErrorMessages();
 
-                let currentForm = `${this.entity}Form`;
+                let currentForm = `${this.entity.toLowerCase()}Form`;
                 let errors = validateInputs({ [currentForm] : this.form[currentForm]});
 
                 if (errors.length > 0) {
                     errors.forEach(error => this.errorMessages.push(error));
                     return;
                 }
-
-                store.dispatch('determineFormMutation', { entity: this.entity, data: this.createEntityObject(this.form[currentForm], this.item ? this.item.id : null), crudFunction: this.crudFunction})
-                .then(() => this.$emit('closeForm', false))
-                .catch((error) => this.errorMessages.push(error.response.data));
+                
+                this.handleFormSubmission[this.entity](this.createEntityObject(this.form[currentForm], this.item ? this.item.id : null), this.crudFunction)
+                .then(() => this.$emit('closeForm', false)).catch((error) => this.errorMessages.push(error));
             },
             closeForm() {
                 this.$emit('closeForm', false);
@@ -137,27 +140,29 @@ import { formatDateToInputValue } from '../../../../utils/dateUtils';
         },
         computed: {
             getText() {
-                return this.crudFunction === 'CREATE' ? `Create ${this.entity}` : `Update ${this.entity}`;
+                return this.crudFunction === 'CREATE' ? `Create ${this.entity.toLowerCase()}` : `Update ${this.entity.toLowerCase()}`;
             },
             getInputFields() {
-                let currentForm = `${this.entity}Form`;
+                let currentForm = `${this.entity.toLowerCase()}Form`;
                 return this.form[currentForm].inputFields;
             },
             onFormInvalid() {
                 return this.errorMessages;
             },
-            getElections() {
-                return store.getters.getElections;
+            getElectionOptions() {
+                return store.getters.getElectionOptions;
             },
             getElectionsPerParticipatingCandidate() {
                 return store.getters.getElectionsPerParticipatingCandidate;
             },
             isFormInUpdateMode() {
-                return this.entity === 'candidate' && this.crudFunction == 'UPDATE';
-            }
+                return ['CANDIDATE'].includes(this.entity) && this.crudFunction === 'UPDATE';
+            },
         },
         created() {
-            store.dispatch('loadItems', { functionToBeCalled: 'SET_ELECTIONS', entity: 'election' });
+            if (['CANDIDATE'].includes(this.entity)) {
+                store.dispatch('loadElections');
+            }
             if (this.isFormInUpdateMode) {
                 store.dispatch('loadParticipatingElectionsPerCandidate', { candidate: this.item });
                 setTimeout(() => {
