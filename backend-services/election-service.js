@@ -31,5 +31,5 @@ export const performUpdateElection = async(paramRequestBody) => {
 }
 
 export const performDeleteElection = async (paramId) => {
-    return handleDatabaseService.delete(paramId);
+    return handleDatabaseService.delete({ id: paramId });
 }

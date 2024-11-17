@@ -15,5 +15,5 @@ export const performUpdateCandidate = async(paramRequestBody) => {
 }
 
 export const performDeleteCandidate = async(paramId) => {
-    return handleDatabaseService.delete(paramId);
+    return handleDatabaseService.delete({id: paramId});
 }

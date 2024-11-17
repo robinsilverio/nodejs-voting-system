@@ -2,8 +2,8 @@ import { getRequestBody, isValidId, sendResponse } from "../server-routes.js";
 import { performCreateCandidate, performDeleteCandidate, performRetrieveCandidates, performUpdateCandidate } from "../backend-services/candidate-service.js";
 import { statusCodes } from "../src/enums/status-codes.js";
 import { existsInDatabase } from "../dbclient.js";
-import { performRetrieveElections } from "../backend-services/election-service.js";
-import { performInsertParticipatingCandidate } from "../backend-services/participating-candidate-service.js";
+import { performRetrieveElections, performRetrieveElectionsByParticipatingCandidate } from "../backend-services/election-service.js";
+import { performDeleteParticipatingCandidate, performInsertParticipatingCandidate } from "../backend-services/participating-candidate-service.js";
 import { filteredObjectByConditionSet } from "../src/utils/objectUtils.js";
 
 export async function retrieveCandidates(paramRes) {
@@ -49,7 +49,17 @@ export async function updateCandidate(paramReq, paramRes) {
         let requestBody = await getRequestBody(paramReq);
         const response = await performUpdateCandidate(filteredObjectByConditionSet(requestBody, (key) => key !== 'participates_in'));
 
-        // Work in progress... for adding and removing elections that a candidate is participating.
+        const candidateId = requestBody.id;
+        const participatedElections = await performRetrieveElectionsByParticipatingCandidate(candidateId);
+        const removedElections = participatedElections.rows.filter(participatedElections => {
+            return !requestBody.participates_in.find(election => election.id === participatedElections.id);
+        });
+
+        for (const election of removedElections) {
+            await performDeleteParticipatingCandidate(election.id);
+        }
+
+        // Work in progress: Add new elections to the candidate
         
         return sendResponse(paramRes, statusCodes.SUCCESS, response.data);
     } catch (error) {

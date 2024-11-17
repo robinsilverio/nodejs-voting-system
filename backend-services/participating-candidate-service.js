@@ -11,3 +11,7 @@ export const performInsertParticipatingCandidate = async(paramCandidateId, param
     }
     return await handleDatabaseService.create(requestBody);
 }
+
+export const performDeleteParticipatingCandidate = async(paramElectionId)  => {
+    return await handleDatabaseService.delete({ election_id: paramElectionId });
+}

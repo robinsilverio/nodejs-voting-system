@@ -28,11 +28,11 @@ export class HandleDatabaseService {
         }
     }
 
-    async delete(paramId) {
-        if (!await existsInDatabase(this.entity, { id: paramId } )) {
+    async delete(paramConditions) {
+        if (!await existsInDatabase(this.entity, paramConditions)) {
             return { statusCode: statusCodes.NOT_FOUND, data: `${this.entity} not found.` };
         }
-        await deleteFromTable(this.entity, paramId);
+        await deleteFromTable(this.entity, paramConditions);
         return { statusCode: statusCodes.SUCCESS, data: `${this.entity} was successfully deleted.` };
     }
 

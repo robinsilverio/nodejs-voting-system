@@ -36,7 +36,6 @@ export const closeDatabaseConnection = (done) => {
 const executeQuery = async (queryType, paramTableName, paramColumns, paramConditions = {}, paramValues = {}, paramJoin={}) => {
     try {
         const query = returnQuery(queryType, paramTableName, paramColumns, paramConditions, paramValues, paramJoin);
-        console.log(query);
         return await client.query(query);
     } catch (err) {
         throw new Error(`Error executing ${queryType} operation: ${err.message}`);
@@ -129,8 +128,8 @@ export const insertIntoTable = async (paramTableName, paramData) => {
 export const updateFromTable = async (paramTableName, paramData) => {
     await update(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()], { id: paramData.id }, paramData);
 }
-export const  deleteFromTable = async (paramTableName, paramId) => {
-    await remove(paramTableName, { id: paramId });
+export const  deleteFromTable = async (paramTableName, paramConditions) => {
+    await remove(paramTableName, paramConditions);
 }
 
 export default client;
