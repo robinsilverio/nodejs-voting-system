@@ -36,6 +36,7 @@ export const closeDatabaseConnection = (done) => {
 const executeQuery = async (queryType, paramTableName, paramColumns, paramConditions = {}, paramValues = {}, paramJoin={}) => {
     try {
         const query = returnQuery(queryType, paramTableName, paramColumns, paramConditions, paramValues, paramJoin);
+        console.log(query);
         return await client.query(query);
     } catch (err) {
         throw new Error(`Error executing ${queryType} operation: ${err.message}`);

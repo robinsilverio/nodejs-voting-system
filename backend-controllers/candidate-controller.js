@@ -48,8 +48,8 @@ export async function updateCandidate(paramReq, paramRes) {
     try {
         let requestBody = await getRequestBody(paramReq);
         const response = await performUpdateCandidate(filteredObjectByConditionSet(requestBody, (key) => key !== 'participates_in'));
-
         const candidateId = requestBody.id;
+        const registeredElections = await performRetrieveElections();
         const participatedElections = await performRetrieveElectionsByParticipatingCandidate(candidateId);
         const removedElections = participatedElections.rows.filter(participatedElections => {
             return !requestBody.participates_in.find(election => election.id === participatedElections.id);
@@ -59,9 +59,18 @@ export async function updateCandidate(paramReq, paramRes) {
             await performDeleteParticipatingCandidate(election.id);
         }
 
-        // Work in progress: Add new elections to the candidate
+        const newElections = requestBody.participates_in.filter(election => {
+            return !participatedElections.rows.find(participatedElection => participatedElection.id === election.id);
+        });
+
+        for (const election of newElections) {
+            const electionId = registeredElections.rows.find(participatedElection => participatedElection.election_name === election.label).id;
+            console.log(electionId);
+            await performInsertParticipatingCandidate(candidateId, electionId);
+        }
         
         return sendResponse(paramRes, statusCodes.SUCCESS, response.data);
+    
     } catch (error) {
         console.error(error);
         return sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, 'Internal Server Error during updating candidate');
