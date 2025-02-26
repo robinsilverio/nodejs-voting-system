@@ -24,7 +24,7 @@
         },
         computed: {
             getElections() {
-                return store.getters.items;
+                return store.getters.getElections;
             }
         },
         methods: {
@@ -33,7 +33,7 @@
             }
         },
         created() {
-            store.dispatch('loadItems',  'elections');
+            store.dispatch('loadElections');
         }
     }
 </script>
