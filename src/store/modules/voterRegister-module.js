@@ -17,7 +17,7 @@ export const voterRegisterModule = {
             return voterRegisterService.registerVoter(payload)
             .then((success) => {
                 commit('setVoter', success.data);
-                router.push('/voter-view');
+                router.push('/voter-view/available-elections');
             }).catch((error) => {
                 if (error.code === 'ERR_NETWORK') {
                     throw new Error('Network Error: Could not reach the server.');

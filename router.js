@@ -5,6 +5,8 @@ import Home from '@/components/views/home/Home.vue';
 import VoterView from '@/components/views/VoterView/VoterView.vue';
 import axios from 'axios';
 import { createMemoryHistory, createRouter } from 'vue-router';
+import AvailableElections from '@/components/views/VoterView/related-components/AvailableElections.vue';
+import Election from '@/components/views/VoterView/related-components/Election.vue';
 
 const routes = [
   {
@@ -21,7 +23,19 @@ const routes = [
   {
     path: '/voter-view',
     name: 'VoterView',
-    component: VoterView
+    component: VoterView,
+    children: [
+      {
+        path: 'available-elections',
+        name: 'available-elections',
+        component: AvailableElections
+      },
+      {
+        path: 'election/:id',
+        name: 'election',
+        component: Election
+      } 
+    ]
   },
   {
     path: '/:pathMatch(.*)*',
@@ -37,7 +51,7 @@ const routes = [
 
 const pathByRole = {
   'ADMIN':  '/dashboard',
-  'VOTER': '/voter-view',
+  'VOTER': '/voter-view/available-elections',
 }
 
 
@@ -64,10 +78,12 @@ router.beforeEach(async(to, from, next) => {
 
       // Redirect to dashboard if user tries to access the login/home page but is authenticated.
       if (to.path === '/' && rolesAllowed.includes(userRole)) {
-        next(pathByRole[userRole]);
+        return next(pathByRole[userRole]);
       }
-      // Allow access to the dashboard only if the user has the 'ADMIN' role
-      if ((to.path === '/dashboard' || to.path === '/voter-view') && !rolesAllowed.includes(userRole)) {
+      if (to.path === '/dashboard' && userRole !== 'ADMIN') {
+        return next('/access-denied');
+      }
+      if (to.path.startsWith('/voter-view') && userRole !== 'VOTER') {
         return next('/access-denied');
       }
 
@@ -77,9 +93,6 @@ router.beforeEach(async(to, from, next) => {
       sessionStorage.removeItem('authToken'); // Clear the token if validation fails
       return next('/'); // Redirect to home if token validation fails
     }
-  } else if (!token && authRequired) {
-    // Redirect to home if the user is not authenticated and trying to access a protected route
-    return next('/');
   } else {
     // Allow access to public pages
     next();

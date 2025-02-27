@@ -1,51 +1,33 @@
 <template>
     <HeaderComponent></HeaderComponent>
+    <div class="cover"></div>
     <div class="voterview-container">
-        <h1>Available Elections</h1>
-        <div v-if="getElections.length === 0">No elections available.</div>
-        <ul v-else>
-            <li v-for="election in getElections" :key="election.id">
-                <div>
-                    <h3>{{ election.election_name }}</h3>
-                    <p>{{ election.election_description }}</p>
-                    <button @click="enterElection(election.id)">Enter Election</button>
-                </div>
-            </li>
-        </ul>
+        <RouterView></RouterView>
     </div>
 </template>
 <script>
     import HeaderComponent from '@/components/header/Header.vue';
-    import { store } from '@/store';
     export default {
         name: 'VoterViewComponent',
         components: {
-            HeaderComponent
+            HeaderComponent,
         },
-        computed: {
-            getElections() {
-                return store.getters.getElections;
-            }
-        },
-        methods: {
-            enterElection(paramElectionId) {
-                // Work in progress...
-            }
-        },
-        created() {
-            store.dispatch('loadElections');
-        }
     }
 </script>
 <style scoped>
     .voterview-container {
         width: 80%;
         margin: auto;
-        padding: 15px 0px;
+        padding: 15px;
     }
     h1 {
         padding-left: 40px;
     }
     .voterview-container ul { list-style: none; }
+    .candidates-container {
+        margin: 10px 0;
+        display: flex;
+        gap: 10px;
+    }
 
 </style>
