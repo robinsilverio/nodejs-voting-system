@@ -24,8 +24,8 @@ import { store } from '@/store';
             }
         },
         methods: {
-            enterElection(paramElection) {
-                this.$router.push('/voter-view/election/1');
+            enterElection(paramElectionId) {
+                this.$router.push(`/voter-view/election/${paramElectionId}`);
             }
         },
         created() {

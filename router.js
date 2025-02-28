@@ -33,8 +33,9 @@ const routes = [
       {
         path: 'election/:id',
         name: 'election',
-        component: Election
-      } 
+        component: Election,
+        props: true  // Passes the `id` parameter as a prop
+      }
     ]
   },
   {

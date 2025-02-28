@@ -1,5 +1,5 @@
 <template>
-    <div v-if="selectedElection" class="selected-election">
+    <div class="selected-election">
         <h3>Vote for a Candidate in {{ selectedElection.name }}</h3>
         <div class="candidates-container">
             <button v-for="candidate in candidates" :key="candidate.id" 
@@ -18,12 +18,15 @@
             candidates: []
         }),
         props: {
-            selectedElection: null
+            id: Number
         },
         methods: {
             submitVote() {
                 // Submit vote to server
             }
+        },
+        created() {
+            
         }
     }
 </script>

@@ -1,6 +1,5 @@
 <template>
     <HeaderComponent></HeaderComponent>
-    <div class="cover"></div>
     <div class="voterview-container">
         <RouterView></RouterView>
     </div>
@@ -10,7 +9,7 @@
     export default {
         name: 'VoterViewComponent',
         components: {
-            HeaderComponent,
+            HeaderComponent
         },
     }
 </script>
