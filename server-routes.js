@@ -12,6 +12,7 @@ import {
     createCandidate, 
     deleteCandidate, 
     retrieveCandidates, 
+    retrieveCandidatesByElection, 
     updateCandidate 
 } from './backend-controllers/candidate-controller.js';
 import { authorizeJwt } from './middleware/auth-middleware.js';
@@ -33,6 +34,7 @@ router.put('/elections', authorizeJwt, (req, res) => updateElection(req, res));
 router.delete('/elections', authorizeJwt, (req, res) => deleteElection(req, res));
 router.post('/candidates', authorizeJwt, (req, res) => createCandidate(req, res));
 router.get('/candidates', authorizeJwt, (req, res) => retrieveCandidates(res));
+router.get('/candidates/election/:id', (req, res) => retrieveCandidatesByElection(req, res));
 router.put('/candidates', authorizeJwt, (req, res) => updateCandidate(req, res));
 router.delete('/candidates', authorizeJwt, (req, res) => deleteCandidate(req, res));
 

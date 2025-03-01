@@ -41,7 +41,10 @@ export const elections = {
                 })
                 .catch(error => {
                     console.error('Action failed:', error);
-                    throw error;
+                    if (error.code === 'ERR_NETWORK') {
+                        throw new Error('Network error occurred while trying to create or update election.');
+                    }
+                    throw error.response.data;
                 });
         },
         deleteElection({ dispatch, state }, paramObject) {

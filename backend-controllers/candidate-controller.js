@@ -3,8 +3,22 @@ import { performCreateCandidate, performDeleteCandidate, performRetrieveCandidat
 import { statusCodes } from "../src/enums/status-codes.js";
 import { existsInDatabase } from "../dbclient.js";
 import { performRetrieveElections, performRetrieveElectionsByParticipatingCandidate } from "../backend-services/election-service.js";
-import { performDeleteParticipatingCandidate, performInsertParticipatingCandidate } from "../backend-services/participating-candidate-service.js";
+import { performDeleteParticipatingCandidate, performInsertParticipatingCandidate, performRetrieveCandidatesByElection } from "../backend-services/participating-candidate-service.js";
 import { filteredObjectByConditionSet } from "../src/utils/objectUtils.js";
+
+export async function retrieveCandidatesByElection(paramReq, paramRes) {
+    
+    if(!isValidId(paramReq.params)) {
+        return sendResponse(paramRes, statusCodes.BAD_REQUEST, "Invalid election id");
+    }
+    try {
+        const electionId = paramReq.params.id;
+        const result = await performRetrieveCandidatesByElection(electionId);
+        return sendResponse(paramRes, statusCodes.SUCCESS, result.rows);
+    } catch (error) {
+        sendResponse(paramRes, statusCodes.INTERNAL_SERVER_ERROR, "Error retrieving candidates by election");
+    }
+}
 
 export async function retrieveCandidates(paramRes) {
     try {

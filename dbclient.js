@@ -12,6 +12,10 @@ const client = new Client(
     }
 );
 
+// Define table aliases for main and joined tables
+const mainTableAlias = 'maintable';
+const joinTableAlias = 'jointable';
+
 export const startDatabaseConnection = () => {
     client.connect().then(() => {
 		console.log('Connected to PostgreSQL database');
@@ -58,19 +62,6 @@ const remove = (paramTableName,  paramConditions) => {
 
 
 const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditions = {}, paramValues = {}, paramJoin = {}) => {
-    
-    // Define table aliases for main and joined tables
-    const mainTableAlias = 'maintable';
-    const joinTableAlias = 'jointable';
-
-    // Create column references with aliases to avoid ambiguity
-    const columns = paramColumns.map(column => {
-        // Check if the column is from the main or join table
-        if (column.includes('.')) {
-            return `${column}`;
-        }
-        return `${paramJoin && paramJoin.tableColumns?.includes(column) ? joinTableAlias : mainTableAlias}.${column}`;
-    }).join(', ');
 
     const whereClause = Object.keys(paramConditions).length > 0
         ? `WHERE ${Object.keys(paramConditions).map((key, index) => `${key} = $${index + 1}`).join(' AND ')}`
@@ -83,7 +74,7 @@ const returnQuery = (paramQueryType, paramTableName, paramColumns, paramConditio
     switch (paramQueryType) {
         case 'SELECT':
             return {
-                text: `SELECT ${columns} FROM ${paramTableName} ${mainTableAlias} ${joinClause} ${whereClause}`,
+                text: `SELECT ${paramColumns.join(', ')} FROM ${paramTableName} ${mainTableAlias} ${joinClause} ${whereClause}`,
                 values: Object.values(paramConditions)
             };
         case 'INSERT':
@@ -114,14 +105,29 @@ export const filterId = (paramRequestBody) => {
     );
 }
 export const existsInDatabase = async (paramTableName, paramConditions) => {
-    const result = await retrieve(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()], paramConditions);
+    const result = await retrieve(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()].map(column => `${mainTableAlias}.${column}`), paramConditions);
     return result.rows.length >  0 ? result.rows[0] : null;
 }   
 export const retrieveFromTable = async(paramTableName, paramConditions) => {
-    return await retrieve(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()], paramConditions);
+    
+    const formattedColumns = tableColumnsPerTable[paramTableName.toUpperCase()].map(column => `${mainTableAlias}.${column}`);
+    return await retrieve(paramTableName, formattedColumns, paramConditions);
 }
 export const retrieveFromTableUsingJoin = async(paramTableName, paramJoinInformation) => {
-    return await retrieve(paramTableName, paramJoinInformation.selectedColumns, paramJoinInformation.whereCondition, {},  paramJoinInformation);
+
+    const { maintableColumns = [], joinTableColumns = [] } = paramJoinInformation.selectedColumns || {};
+
+    
+    const formattedMaintableColumns = maintableColumns.map(column => {
+        return `${mainTableAlias}.${column}`;
+    });
+    const formattedJoinTableColumns = joinTableColumns.map(column => {
+        return `${joinTableAlias}.${column}`;
+    });
+    
+    const formattedColumns = [...formattedMaintableColumns, ...formattedJoinTableColumns];
+
+    return await retrieve(paramTableName, formattedColumns, paramJoinInformation.whereCondition, {},  paramJoinInformation);
 }
 export const insertIntoTable = async (paramTableName, paramData) => {
     return await insert(paramTableName, tableColumnsPerTable[paramTableName.toUpperCase()].filter(column => column !== 'id'), Object.values(filterId(paramData)));

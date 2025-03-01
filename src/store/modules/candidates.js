@@ -35,7 +35,10 @@ export const candidates = {
                 })
                 .catch(error => {
                     console.error('Action failed:', error);
-                    throw error;
+                    if (error.code === 'ERR_NETWORK') {
+                        throw new Error('Network error occurred while trying to create candidate.');
+                    }
+                    throw error.response.data;
                 });
         },
         deleteCandidate({ state, dispatch }, paramObject) {

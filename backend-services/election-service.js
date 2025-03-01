@@ -12,7 +12,10 @@ export const retrieveElectionByElectionName =  async(paramElectionName) => {
 
 export const performRetrieveElectionsByParticipatingCandidate = async(paramId) => {
     const joinInformation = {
-        selectedColumns: ['id', 'election_name'],
+        selectedColumns: {
+            maintableColumns: ["id", "election_name"],
+            joinTableColumns: [],
+        },
         joinTable: 'participating_candidates',
         on: 'id',
         referenceColumn: 'election_id',
