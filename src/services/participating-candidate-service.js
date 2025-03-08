@@ -4,6 +4,9 @@ export class ParticipatingCandidateService {
     baseAPIUrl = process.env.VUE_APP_API_BASE_URL;
     electionApiUrl = `${this.baseAPIUrl}/elections/candidate`;
     
+    loadCandidatesByParticpatingElection(paramId) {
+        return axios.get(`${this.baseAPIUrl}/candidates/election/${paramId}`, {headers: {'Authorization' : `Bearer ${sessionStorage.getItem('authToken')}`} });
+    }
     load(paramId) {
         return axios.get(this.electionApiUrl + `/${paramId}`, {headers: {'Authorization' : `Bearer ${sessionStorage.getItem('authToken')}`}});
     }

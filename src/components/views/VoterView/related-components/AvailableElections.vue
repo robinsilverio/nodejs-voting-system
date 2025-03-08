@@ -6,7 +6,7 @@
                 <div>
                     <h3>{{ election.election_name }}</h3>
                     <p>{{ election.election_description }}</p>
-                    <button @click="enterElection(election.id)">Enter Election</button>
+                    <button @click="enterElection(election)">Enter Election</button>
                 </div>
             </li>
         </ul>
@@ -24,8 +24,9 @@ import { store } from '@/store';
             }
         },
         methods: {
-            enterElection(paramElectionId) {
-                this.$router.push(`/voter-view/election/${paramElectionId}`);
+            enterElection(paramElection) {
+                this.$emit('onElectionSelect', paramElection)
+                this.$router.push(`/voter-view/election/${paramElection.id}`);
             }
         },
         created() {
@@ -33,3 +34,6 @@ import { store } from '@/store';
         }
     }
 </script>
+<style scoped>
+    ul { list-style: none; padding: 0; }
+</style>

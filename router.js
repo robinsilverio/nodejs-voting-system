@@ -4,7 +4,7 @@ import DashboardComponent from '@/components/views/dashboard/Dashboard.vue';
 import Home from '@/components/views/home/Home.vue';
 import VoterView from '@/components/views/VoterView/VoterView.vue';
 import axios from 'axios';
-import { createMemoryHistory, createRouter } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import AvailableElections from '@/components/views/VoterView/related-components/AvailableElections.vue';
 import Election from '@/components/views/VoterView/related-components/Election.vue';
 
@@ -57,7 +57,7 @@ const pathByRole = {
 
 
 export const router = createRouter({
-  history: createMemoryHistory(),
+  history: createWebHistory(),
   routes,
 });
 

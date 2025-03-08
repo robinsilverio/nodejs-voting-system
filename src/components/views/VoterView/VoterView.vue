@@ -1,13 +1,21 @@
 <template>
     <HeaderComponent></HeaderComponent>
     <div class="voterview-container">
-        <RouterView></RouterView>
+        <RouterView :selectedElection="this.selectedElection" @onElectionSelect="onElectionSelect"></RouterView>
     </div>
 </template>
 <script>
     import HeaderComponent from '@/components/header/Header.vue';
     export default {
         name: 'VoterViewComponent',
+        data: () => ({
+            selectedElection: null
+        }),
+        methods: {
+            onElectionSelect(paramElection) {
+                this.selectedElection = paramElection;
+            }
+        },
         components: {
             HeaderComponent
         },
@@ -22,7 +30,6 @@
     h1 {
         padding-left: 40px;
     }
-    .voterview-container ul { list-style: none; }
     .candidates-container {
         margin: 10px 0;
         display: flex;
